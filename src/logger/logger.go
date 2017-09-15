@@ -1,4 +1,4 @@
-package log
+package logger
 
 import (
 	"bufio"
@@ -9,38 +9,38 @@ import (
 	"strings"
 )
 
-type logger struct {
+type writer struct {
 	file  string
 	level string
 }
 
-func (logger *logger) write(data map[string]string, level string) {
+func (logger *writer) write(data map[string]string, level string) {
 
 }
 
-func (logger *logger) setLevel(data map[string]string, level string) {
+func (logger *writer) setLevel(data map[string]string, level string) {
 
 }
 
-func (logger *logger) setLogFile() {
+func (logger *writer) setLogFile() {
 	// todo 加载全局配置中的日志目录
 	file_name := getPkgName() + "/" + getFileName()
 	logger.file = file_name
 }
 
-func (logger *logger) setLogLevel(level string) {
+func (logger *writer) setLogLevel(level string) {
 	logger.level = level
 }
 
-func Debug() {
+func Debug(info map[string]string) {
 
 }
 
-func Warning() {
+func Warning(info map[string]string) {
 
 }
 
-func Error() {
+func Error(info map[string]string) {
 
 }
 
