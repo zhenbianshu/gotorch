@@ -16,8 +16,9 @@ type conf struct {
 }
 
 func newConf() *conf {
-
-	file, err := os.Open("./config/gotask.ini")
+	root_path, _ := os.Getwd()
+	file, err := os.Open(root_path + "/src/config/gotask.ini")
+	fmt.Println(root_path + "/config/gotask.ini")
 	if err != nil {
 		log_info := map[string]string{"error": err.Error(), "desc": "error get config file!"}
 		logger.Error(log_info)
@@ -25,7 +26,7 @@ func newConf() *conf {
 	}
 	defer file.Close()
 
-	var config_data map[string]string
+	config_data := make(map[string]string)
 	reader := bufio.NewReader(file)
 	for {
 		line, _, err := reader.ReadLine()
