@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"logger"
 	"os"
 	"strings"
 )
@@ -20,8 +19,6 @@ func newConf() *conf {
 	file, err := os.Open(root_path + "/src/config/gotask.ini")
 	fmt.Println(root_path + "/config/gotask.ini")
 	if err != nil {
-		log_info := map[string]string{"error": err.Error(), "desc": "error get config file!"}
-		logger.Error(log_info)
 		os.Exit(222)
 	}
 	defer file.Close()
@@ -37,7 +34,6 @@ func newConf() *conf {
 	}
 
 	conf := &conf{config_data}
-	fmt.Println("new Configger")
 
 	return conf
 }
