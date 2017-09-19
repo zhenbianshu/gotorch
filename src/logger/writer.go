@@ -4,7 +4,6 @@ import (
 	"config"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -35,17 +34,9 @@ func (logger *writer) setLogFile(level string) {
 
 func (logger *writer) write(data map[string]string, level string) {
 	logger.setLogFile(level)
-	if !isFileExist(logger.file) {
-		// todo 考虑并发
-		os.Create(logger.file)
-	}
-
 	log_content, _ := json.Marshal(data)
 	log_content = append(log_content, '\n')
-	fmt.Println(string(log_content), logger.file)
 
-	file, _ := os.OpenFile(logger.file, os.O_WRONLY, 0644)
-	offset, _ := file.Seek(0, io.SeekEnd)
-	file.WriteAt(log_content, offset)
-
+	file, _ := os.OpenFile(logger.file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	file.Write(log_content)
 }
