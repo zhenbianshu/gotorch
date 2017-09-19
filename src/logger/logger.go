@@ -22,7 +22,8 @@ func Warning(info map[string]string) {
 	logger.write(info, LOG_LEVEL_WARNING)
 }
 
-func Error(info map[string]string) {
+func Error(err string) {
+	info := map[string]string{"error": err}
 	logger := getLogWriter()
 	logger.write(info, LOG_LEVEL_ERROR)
 }
@@ -54,9 +55,4 @@ func isDirExist(path string) bool {
 	} else {
 		return file.IsDir()
 	}
-}
-
-func isFileExist(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil || os.IsExist(err)
 }

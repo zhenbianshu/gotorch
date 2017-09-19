@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 type writer struct {
@@ -28,11 +29,12 @@ func (logger *writer) setLogFile(level string) {
 		os.MkdirAll(log_dir, 0777)
 	}
 	file_name := getFileName() + "_" + level + ".log"
-	fmt.Println(logger.file)
 	logger.file = log_dir + file_name
 }
 
 func (logger *writer) write(data map[string]string, level string) {
+	t := time.Now()
+	data["time"] = t.Format(time.UnixDate)
 	logger.setLogFile(level)
 	log_content, _ := json.Marshal(data)
 	log_content = append(log_content, '\n')
