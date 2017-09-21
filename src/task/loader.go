@@ -36,7 +36,7 @@ func addTask(line string) {
 		return
 	}
 
-	task := newTask()
+	task := newTask(task_config)
 	AddTask(task)
 
 }
