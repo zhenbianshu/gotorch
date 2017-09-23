@@ -1,18 +1,15 @@
 package task
 
-var time_type = []string{"second", "minute", "hour", "day", "month", "week"}
-
-const (
-	SECOND = iota
-	MINUTE
-	HOUR
-	DAY
-	MONTH
-	WEEK
-)
-
 type task struct {
-	time_next int
-	each      map[string][]int
-	every     map[string]int
+	next  int
+	each  map[string][]int
+	every map[string]int
+	attr  attr
+}
+
+func (task *task) init() {
+	task.setNext()
+}
+
+func (task *task) setNext() {
 }

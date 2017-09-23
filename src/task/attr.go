@@ -13,6 +13,8 @@ type attr struct {
 	Ips       []string
 }
 
+var time_type = []string{"second", "minute", "hour", "day", "month", "week"}
+
 func (config attr) timeValid() (is_valid bool, err_desc string) {
 	times := strings.Split(config.Times, " ")
 	if len(times) != 6 {
@@ -55,7 +57,7 @@ func (config attr) buildTask() (task *task, err_desc string) {
 		each[map_key] = getEach(arg_str)
 	}
 
-	return &task{every: every, each: each}, ""
+	return &task{every: every, each: each, attr: config}, ""
 }
 
 func inRange(num int, index int) bool {
@@ -84,18 +86,6 @@ func inRange(num int, index int) bool {
 	}
 
 	return valid
-}
-
-func newTask(task_config []string) *task {
-	var map_key string
-	each := make(map[string][]int)
-	every := make(map[string]int)
-	for index, arg_str := range task_config[:5] {
-		map_key = time_type[index]
-		every[map_key] = getEvery(arg_str)
-		each[map_key] = getEach(arg_str)
-	}
-	return &task{}
 }
 
 func getEvery(arg_str string) int {

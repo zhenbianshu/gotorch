@@ -34,7 +34,7 @@ func Load() {
 			fmt.Print(err_desc)
 			os.Exit(1)
 		}
-
+		task.init()
 		AddTask(task)
 	}
 }
