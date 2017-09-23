@@ -1,12 +1,11 @@
 package task
 
 import (
-	"bufio"
 	"config"
-	"io"
-	"logger"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
-	"strings"
 )
 
 var Task_list []*task
@@ -14,31 +13,30 @@ var Task_list []*task
 func Load() {
 	tasks_file_name := config.GetConfig("tasks")
 
-	file_handler, err := os.OpenFile(tasks_file_name, os.O_RDONLY, 0644)
+	file_handler, err := os.Open(tasks_file_name)
+
 	if err != nil {
-		logger.Error("can't find the tasks file!")
+		fmt.Println("can't find the tasks file!")
+		os.Exit(1)
 	}
 
-	reader := bufio.NewReader(file_handler)
-	for {
-		line, _, err := reader.ReadLine()
-		if err == io.EOF {
-			break
+	file_data, _ := ioutil.ReadAll(file_handler)
+	var task_configs []attr
+	err = json.Unmarshal(file_data, task_configs)
+	if err != nil {
+		fmt.Println("task config parse error: " + err.Error())
+		os.Exit(1)
+	}
+
+	for _, attr := range task_configs {
+		task, err_desc := attr.buildTask()
+		if task == nil {
+			fmt.Print(err_desc)
+			os.Exit(1)
 		}
 
-		addTask(string(line))
+		AddTask(task)
 	}
-}
-
-func addTask(line string) {
-	task_config := strings.Split(line, " ")
-	if !checkValid(task_config) {
-		return
-	}
-
-	task := newTask(task_config)
-	AddTask(task)
-
 }
 
 func AddTask(task *task) {
