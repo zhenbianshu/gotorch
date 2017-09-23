@@ -28,27 +28,29 @@ func newTask(task_config []string) *task {
 	every := make(map[string]int)
 	for index, arg_str := range task_config[:5] {
 		map_key = time_type[index]
-		every_pattern, _ := regexp.Compile("/\\d")
-		every_num := every_pattern.FindString(arg_str)
-		if every_num {
-			every[map_key] = int(every_num)
-		}
-
-		if strings.IndexAny(arg_str, "*") {
-			each[map_key] = []int{}
-		} else {
-			each[map_key] = dealEach(arg_str)
-		}
-
+		every[map_key] = getEvery(arg_str)
+		each[map_key] = getEach(arg_str)
 	}
 	return &task{}
 }
 
-func dealEach(arg_str string) []int {
+func getEvery(arg_str string) int {
+	every_pattern, _ := regexp.Compile("/\\d")
+	every_num := every_pattern.FindString(arg_str)
+	if every_num {
+		return int(every_num)
+	} else {
+		return 1
+	}
+}
+
+func getEach(arg_str string) []int {
 	var nums []int
-	if strings.IndexAny(arg_str, ",") {
-		tmp := strings.Split(arg_str, ",")
-		for num := range tmp {
+	if strings.IndexAny(arg_str, "*") > -1 {
+		nums = []int{}
+	} else if strings.IndexAny(arg_str, ",") {
+		num_list := strings.Split(arg_str, ",")
+		for num := range num_list {
 			nums = append(nums, int(num))
 		}
 	} else if strings.IndexAny(arg_str, "-") {
