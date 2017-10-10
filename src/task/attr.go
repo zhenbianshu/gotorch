@@ -2,38 +2,39 @@ package task
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 type attr struct {
-	Script    string
-	Task_type string
-	Times     string
-	Max       int
-	Ips       []string
+	Script   string
+	TaskType string
+	Times    string
+	Max      int
+	Ips      []string
 }
 
-var time_type = []string{"second", "minute", "hour", "day", "month", "week"}
+var timeType = []string{"second", "minute", "hour", "day", "month", "week"}
 
-func (config attr) timeValid() (is_valid bool, err_desc string) {
+func (config attr) timeValid() (isValid bool, errDesc string) {
 	times := strings.Split(config.Times, " ")
 	if len(times) != 6 {
 		return false, "time format error!"
 	}
 
-	for index, arg_str := range times {
-		if arg_str == "*" {
+	for index, argStr := range times {
+		if argStr == "*" {
 			continue
 		}
 
-		if regexp.MatchString("[^*|\\-|,|/|a-zA-Z0-9]", arg_str) {
+		if ok, _ := regexp.MatchString("[^*|\\-|,|/|a-zA-Z0-9]", argStr); ok {
 			return false, "undefined character!"
 		}
 
 		rex, _ := regexp.Compile("\\d")
-		args := rex.FindAllString(arg_str, -1)
-		for arg_num := range args {
-			if !inRange(int(arg_num), index) {
+		args := rex.FindAllString(argStr, -1)
+		for argNum := range args {
+			if !inRange(int(argNum), index) {
 				return false, "time num out of range"
 			}
 		}
@@ -42,22 +43,22 @@ func (config attr) timeValid() (is_valid bool, err_desc string) {
 	return true, ""
 }
 
-func (config attr) buildTask() (task *task, err_desc string) {
-	if is_valid, err_desc := config.timeValid(); !is_valid {
-		return nil, err_desc
+func (config attr) buildTask() (task *taskItem, errDesc string) {
+	if isValid, errDesc := config.timeValid(); !isValid {
+		return nil, errDesc
 	}
 
-	var map_key string
+	var mapKey string
 	each := make(map[string][]int)
 	every := make(map[string]int)
 	times := strings.Split(config.Times, " ")
-	for index, arg_str := range times {
-		map_key = time_type[index]
-		every[map_key] = getEvery(arg_str)
-		each[map_key] = getEach(arg_str)
+	for index, argStr := range times {
+		mapKey = timeType[index]
+		every[mapKey] = getEvery(argStr)
+		each[mapKey] = getEach(argStr)
 	}
-
-	return &task{every: every, each: each, attr: config}, ""
+	taskInstance := taskItem{every: every, each: each, attr: config}
+	return &taskInstance, ""
 }
 
 func inRange(num int, index int) bool {
@@ -89,31 +90,34 @@ func inRange(num int, index int) bool {
 }
 
 func getEvery(arg_str string) int {
-	every_pattern, _ := regexp.Compile("/\\d")
-	every_num := every_pattern.FindString(arg_str)
-	if every_num {
-		return int(every_num)
+	everyPattern, _ := regexp.Compile("/\\d")
+	everyNum := everyPattern.FindString(arg_str)
+	if everyNum != "" {
+		num, _ := strconv.Atoi(everyNum)
+		return num
 	} else {
 		return 1
 	}
 }
 
-func getEach(arg_str string) []int {
+func getEach(argStr string) []int {
 	var nums []int
-	if strings.IndexAny(arg_str, "*") > -1 {
+	if strings.IndexAny(argStr, "*") > -1 {
 		nums = []int{}
-	} else if strings.IndexAny(arg_str, ",") {
-		num_list := strings.Split(arg_str, ",")
-		for num := range num_list {
+	} else if strings.IndexAny(argStr, ",") >= 0 {
+		numList := strings.Split(argStr, ",")
+		for num := range numList {
 			nums = append(nums, int(num))
 		}
-	} else if strings.IndexAny(arg_str, "-") {
-		num_range := strings.Split(arg_str, "-")
-		for i := int(num_range[0]); i <= int(num_range[1]); i++ {
+	} else if strings.IndexAny(argStr, "-") >= 0 {
+		numRange := strings.Split(argStr, "-")
+		limit, _ := strconv.Atoi(numRange[1])
+		for i, _ := strconv.Atoi(numRange[0]); i <= limit; i++ {
 			nums = append(nums, i)
 		}
 	} else {
-		nums = append(nums, int(arg_str))
+		num, _ := strconv.Atoi(argStr)
+		nums = append(nums, num)
 	}
 
 	return nums

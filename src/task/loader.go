@@ -8,30 +8,30 @@ import (
 	"os"
 )
 
-var Task_list []*task
+var TaskList []*taskItem
 
 func Load() {
-	tasks_file_name := config.GetConfig("tasks")
+	tasksFileName := config.GetConfig("tasks")
 
-	file_handler, err := os.Open(tasks_file_name)
+	fileHandler, err := os.Open(tasksFileName)
 
 	if err != nil {
 		fmt.Println("can't find the tasks file!")
 		os.Exit(1)
 	}
 
-	file_data, _ := ioutil.ReadAll(file_handler)
-	var task_configs []attr
-	err = json.Unmarshal(file_data, task_configs)
+	fileData, _ := ioutil.ReadAll(fileHandler)
+	var taskConfigs []attr
+	err = json.Unmarshal(fileData, taskConfigs)
 	if err != nil {
 		fmt.Println("task config parse error: " + err.Error())
 		os.Exit(1)
 	}
 
-	for _, attr := range task_configs {
-		task, err_desc := attr.buildTask()
+	for _, attr := range taskConfigs {
+		task, errDesc := attr.buildTask()
 		if task == nil {
-			fmt.Print(err_desc)
+			fmt.Print(errDesc)
 			os.Exit(1)
 		}
 		task.init()
@@ -39,6 +39,6 @@ func Load() {
 	}
 }
 
-func AddTask(task *task) {
-	Task_list = append(Task_list, task)
+func AddTask(task *taskItem) {
+	TaskList = append(TaskList, task)
 }

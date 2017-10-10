@@ -1,15 +1,15 @@
 package task
 
-type task struct {
+type taskItem struct {
 	next  int
 	each  map[string][]int
 	every map[string]int
 	attr  attr
 }
 
-func (task *task) init() {
+func (task *taskItem) init() {
 	task.setNext()
 }
 
-func (task *task) setNext() {
+func (task *taskItem) setNext() {
 }

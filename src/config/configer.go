@@ -15,57 +15,57 @@ type conf struct {
 }
 
 func newConf() *conf {
-	root_path, _ := os.Getwd()
-	file, err := os.Open(root_path + "/src/config/gotask.ini")
-	fmt.Println(root_path + "/config/gotask.ini")
+	rootPath, _ := os.Getwd()
+	file, err := os.Open(rootPath + "/src/config/gotask.ini")
+	fmt.Println(rootPath + "/config/gotask.ini")
 	if err != nil {
 		os.Exit(222)
 	}
 	defer file.Close()
 
-	config_data := make(map[string]string)
+	configData := make(map[string]string)
 	reader := bufio.NewReader(file)
 	for {
 		line, _, err := reader.ReadLine()
 		if err == io.EOF {
 			break
 		}
-		parseLine(line, config_data)
+		parseLine(line, configData)
 	}
 
-	conf := &conf{config_data}
+	conf := &conf{configData}
 
 	return conf
 }
 
-func parseLine(line []byte, config_data map[string]string) {
+func parseLine(line []byte, configData map[string]string) {
 	if line[0] == '#' {
 		return
 	}
 
 	var key, value []byte
-	equal_sign := false
+	equalSign := false
 
 	for _, v := range line {
 		if v == '#' {
 			break
 		}
 		if v == '=' {
-			equal_sign = true
+			equalSign = true
 			continue
 		}
 
-		if equal_sign {
+		if equalSign {
 			value = append(value, v)
 		} else {
 			key = append(key, v)
 		}
 	}
 
-	if equal_sign {
+	if equalSign {
 		k := strings.Trim(string(key), " ")
 		v := strings.Trim(string(value), " ")
-		config_data[k] = v
+		configData[k] = v
 	}
 
 }

@@ -29,22 +29,22 @@ func Error(err string) {
 }
 
 func getFileName() string {
-	_, _source_path, _, _ := runtime.Caller(4)
-	root_dir, _ := os.Getwd()
+	_, sourcePath, _, _ := runtime.Caller(4)
+	rootDir, _ := os.Getwd()
 
-	filename := strings.TrimSuffix(strings.TrimPrefix(_source_path, root_dir+"/"), ".go")
+	filename := strings.TrimSuffix(strings.TrimPrefix(sourcePath, rootDir+"/"), ".go")
 
 	return filename
 }
 
 func getPkgName() string {
-	_, file_path, _, _ := runtime.Caller(0)
-	file, _ := os.Open(file_path)
+	_, filePath, _, _ := runtime.Caller(0)
+	file, _ := os.Open(filePath)
 	r := bufio.NewReader(file)
 	line, _, _ := r.ReadLine()
-	pkg_name := bytes.TrimPrefix(line, []byte("package "))
+	pkgName := bytes.TrimPrefix(line, []byte("package "))
 
-	return string(pkg_name)
+	return string(pkgName)
 }
 
 func isDirExist(path string) bool {
