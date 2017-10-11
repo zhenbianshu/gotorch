@@ -21,8 +21,8 @@ func Load() {
 	}
 
 	fileData, _ := ioutil.ReadAll(fileHandler)
-	var taskConfigs []attr
-	err = json.Unmarshal(fileData, taskConfigs)
+	taskConfigs := make([]attr, 0)
+	err = json.Unmarshal(fileData, &taskConfigs)
 	if err != nil {
 		fmt.Println("task config parse error: " + err.Error())
 		os.Exit(1)

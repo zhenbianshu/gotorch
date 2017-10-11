@@ -39,6 +39,9 @@ func newConf() *conf {
 }
 
 func parseLine(line []byte, configData map[string]string) {
+	if len(line) <= 0 {
+		return
+	}
 	if line[0] == '#' {
 		return
 	}

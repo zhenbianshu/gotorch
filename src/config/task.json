@@ -1,7 +1,7 @@
 [
   {
     "Script": "",
-    "Task_type": "daemon",
+    "TaskType": "daemon",
     "Times": "* * * * * *",
     "Max": 3,
     "Ips": [
@@ -11,7 +11,7 @@
   },
   {
     "Script": "",
-    "Task_type": "common",
+    "TaskType": "common",
     "Times": "* * * * * *",
     "Max": 1,
     "Ips": [

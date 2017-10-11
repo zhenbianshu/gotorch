@@ -27,11 +27,11 @@ func (config attr) timeValid() (isValid bool, errDesc string) {
 			continue
 		}
 
-		if ok, _ := regexp.MatchString("[^*|\\-|,|/|a-zA-Z0-9]", argStr); ok {
+		if ok, _ := regexp.MatchString(`[^*|\-|,|/|a-zA-Z0-9]`, argStr); ok {
 			return false, "undefined character!"
 		}
 
-		rex, _ := regexp.Compile("\\d")
+		rex, _ := regexp.Compile(`\d`)
 		args := rex.FindAllString(argStr, -1)
 		for argNum := range args {
 			if !inRange(int(argNum), index) {
@@ -89,9 +89,9 @@ func inRange(num int, index int) bool {
 	return valid
 }
 
-func getEvery(arg_str string) int {
-	everyPattern, _ := regexp.Compile("/\\d")
-	everyNum := everyPattern.FindString(arg_str)
+func getEvery(argStr string) int {
+	everyPattern, _ := regexp.Compile(`/\d`)
+	everyNum := everyPattern.FindString(argStr)
 	if everyNum != "" {
 		num, _ := strconv.Atoi(everyNum)
 		return num
