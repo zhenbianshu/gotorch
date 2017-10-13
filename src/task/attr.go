@@ -16,8 +16,8 @@ type attr struct {
 
 var timeType = []string{"second", "minute", "hour", "day", "month", "week"}
 
-func (config attr) timeValid() (isValid bool, errDesc string) {
-	times := strings.Split(config.Times, " ")
+func (a attr) timeValid() (isValid bool, errDesc string) {
+	times := strings.Split(a.Times, " ")
 	if len(times) != 6 {
 		return false, "time format error!"
 	}
@@ -38,26 +38,26 @@ func (config attr) timeValid() (isValid bool, errDesc string) {
 				return false, "time num out of range"
 			}
 		}
-
+		// todo check ,/ 并用等异常配置
 	}
 	return true, ""
 }
 
-func (config attr) buildTask() (task *taskItem, errDesc string) {
-	if isValid, errDesc := config.timeValid(); !isValid {
+func (a attr) buildTask() (task *taskItem, errDesc string) {
+	if isValid, errDesc := a.timeValid(); !isValid {
 		return nil, errDesc
 	}
 
 	var mapKey string
 	each := make(map[string][]int)
 	every := make(map[string]int)
-	times := strings.Split(config.Times, " ")
+	times := strings.Split(a.Times, " ")
 	for index, argStr := range times {
 		mapKey = timeType[index]
 		every[mapKey] = getEvery(argStr)
 		each[mapKey] = getEach(argStr)
 	}
-	taskInstance := taskItem{every: every, each: each, attr: config}
+	taskInstance := taskItem{every: every, each: each, attr: a}
 	return &taskInstance, ""
 }
 

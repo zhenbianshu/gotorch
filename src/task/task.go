@@ -7,9 +7,9 @@ type taskItem struct {
 	attr  attr
 }
 
-func (task *taskItem) init() {
-	task.setNext()
+func (t *taskItem) init() {
+	t.setNext()
 }
 
-func (task *taskItem) setNext() {
+func (t *taskItem) setNext() {
 }

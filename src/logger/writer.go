@@ -21,23 +21,23 @@ func getLogWriter() *writer {
 	return logWriter
 }
 
-func (logger *writer) setLogFile(level string) {
+func (l *writer) setLogFile(level string) {
 	logDirConfig := config.GetConfig("log_dir")
 	logDir := logDirConfig + getPkgName() + "/"
 	if !isDirExist(logDir) {
 		os.MkdirAll(logDir, 0777)
 	}
 	fileName := getFileName() + "_" + level + ".log"
-	logger.file = logDir + fileName
+	l.file = logDir + fileName
 }
 
-func (logger *writer) write(data map[string]string, level string) {
+func (l *writer) write(data map[string]string, level string) {
 	t := time.Now()
 	data["time"] = t.Format(time.UnixDate)
-	logger.setLogFile(level)
+	l.setLogFile(level)
 	logContent, _ := json.Marshal(data)
 	logContent = append(logContent, '\n')
 
-	file, _ := os.OpenFile(logger.file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	file, _ := os.OpenFile(l.file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	file.Write(logContent)
 }

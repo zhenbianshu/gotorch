@@ -2,7 +2,7 @@
   {
     "Script": "",
     "TaskType": "daemon",
-    "Times": "* * * * * *",
+    "Times": "3 * * * * *",
     "Max": 3,
     "Ips": [
       "172.16.18.10",
@@ -12,7 +12,7 @@
   {
     "Script": "",
     "TaskType": "common",
-    "Times": "* * * * * *",
+    "Times": "* 2-4 * * * *",
     "Max": 1,
     "Ips": [
       "172.16.18.88"
