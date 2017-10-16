@@ -2,9 +2,14 @@ package task
 
 type taskItem struct {
 	next  int
-	each  map[string][]int
-	every map[string]int
+	times map[string][]timeRange
 	attr  attr
+}
+
+type timeRange struct {
+	start int
+	end   int
+	every int
 }
 
 func (t *taskItem) init() {

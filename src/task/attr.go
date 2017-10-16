@@ -1,6 +1,7 @@
 package task
 
 import (
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -49,76 +50,104 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 	}
 
 	var mapKey string
-	each := make(map[string][]int)
-	every := make(map[string]int)
-	times := strings.Split(a.Times, " ")
-	for index, argStr := range times {
+	times := make(map[string][]timeRange)
+	timeConf := strings.Split(a.Times, " ")
+	for index, argStr := range timeConf {
 		mapKey = timeType[index]
-		every[mapKey] = getEvery(argStr)
-		each[mapKey] = getEach(argStr)
+		limitList, err := parseTimeRange(argStr, index)
+		if err != nil {
+			return nil, err.Error()
+		}
+		times[mapKey] = limitList
 	}
-	taskInstance := taskItem{every: every, each: each, attr: a}
+	taskInstance := taskItem{times: times, attr: a}
 	return &taskInstance, ""
 }
 
 func inRange(num int, index int) bool {
 	valid := true
-	switch index {
-	case 0, 1:
-		if num > 59 || num < 0 {
-			valid = false
-		}
-	case 2:
-		if num > 23 || num < 0 {
-			valid = false
-		}
-	case 3:
-		if num > 31 || num < 1 {
-			valid = false
-		}
-	case 4:
-		if num > 12 || num < 1 {
-			valid = false
-		}
-	case 5:
-		if num > 7 || num < 1 {
-			valid = false
-		}
+	start, end := getRange(index)
+	if num > end || num < start {
+		valid = false
 	}
 
 	return valid
 }
 
-func getEvery(argStr string) int {
-	everyPattern, _ := regexp.Compile(`/\d`)
-	everyNum := everyPattern.FindString(argStr)
-	if everyNum != "" {
-		num, _ := strconv.Atoi(everyNum)
-		return num
-	} else {
-		return 1
+func parseTimeRange(argStr string, index int) ([]timeRange, error) {
+	parseErr := errors.New("time range parse error")
+	argParts := strings.Split(argStr, ",")
+	limitList := make([]timeRange, 0)
+	for _, argPart := range argParts {
+		eachArg := strings.Split(argPart, "/")
+		if len(eachArg) > 2 {
+			return []timeRange{}, parseErr
+		}
+
+		limit := timeRange{}
+		if len(eachArg) == 1 {
+			limit.every = 1
+		} else {
+			every, err := strconv.Atoi(eachArg[1])
+			if err != nil {
+				return []timeRange{}, parseErr
+			}
+			limit.every = every
+		}
+
+		if strings.IndexAny(eachArg[0], "-") >= 0 {
+			numRange := strings.Split(argStr, "-")
+			if len(numRange) != 2 {
+				return []timeRange{}, parseErr
+			}
+
+			start, tErr := strconv.Atoi(numRange[0])
+			end, dErr := strconv.Atoi(numRange[0])
+			if tErr != nil || dErr != nil {
+				return []timeRange{}, parseErr
+			}
+			limit.start = start
+			limit.end = end
+		} else if eachArg[0] == "*" {
+			start, end := getRange(index)
+			limit.start = start
+			limit.end = end
+		} else {
+			num, err := strconv.Atoi(eachArg[0])
+			if err != nil {
+				return []timeRange{}, parseErr
+			}
+			limit.start = num
+			limit.end = num
+		}
+		limitList = append(limitList, limit)
 	}
+
+	return limitList, nil
 }
 
-func getEach(argStr string) []int {
-	var nums []int
-	if strings.IndexAny(argStr, "*") > -1 {
-		nums = []int{}
-	} else if strings.IndexAny(argStr, ",") >= 0 {
-		numList := strings.Split(argStr, ",")
-		for num := range numList {
-			nums = append(nums, int(num))
-		}
-	} else if strings.IndexAny(argStr, "-") >= 0 {
-		numRange := strings.Split(argStr, "-")
-		limit, _ := strconv.Atoi(numRange[1])
-		for i, _ := strconv.Atoi(numRange[0]); i <= limit; i++ {
-			nums = append(nums, i)
-		}
-	} else {
-		num, _ := strconv.Atoi(argStr)
-		nums = append(nums, num)
+func getRange(index int) (start, end int) {
+	switch index {
+	case 0, 1:
+		start = 0
+		end = 59
+	case 2:
+		start = 0
+		end = 23
+
+	case 3:
+		start = 1
+		end = 31
+	case 4:
+		start = 1
+		end = 12
+	case 5:
+		start = 1
+		end = 7
+	default:
+		start = 0
+		end = 0
 	}
 
-	return nums
+	return start, end
 }
