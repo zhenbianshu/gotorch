@@ -1,7 +1,11 @@
 package task
 
+import (
+	"time"
+)
+
 type taskItem struct {
-	next  int
+	next  int64
 	times map[string][]timeRange
 	attr  attr
 }
@@ -17,4 +21,19 @@ func (t *taskItem) init() {
 }
 
 func (t *taskItem) setNext() {
+	// todo method to get next time
+}
+
+func (t *taskItem) CheckTime() {
+	current := time.Now()
+	timestamp := current.Unix()
+
+	if timestamp > t.next {
+		t.Exec()
+		t.setNext()
+	}
+}
+
+func (t *taskItem) Exec() {
+
 }

@@ -39,7 +39,6 @@ func (a attr) timeValid() (isValid bool, errDesc string) {
 				return false, "time num out of range"
 			}
 		}
-		// todo check ,/ 并用等异常配置
 	}
 	return true, ""
 }
@@ -48,6 +47,7 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 	if isValid, errDesc := a.timeValid(); !isValid {
 		return nil, errDesc
 	}
+	// todo check command executable
 
 	var mapKey string
 	times := make(map[string][]timeRange)
