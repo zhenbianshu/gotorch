@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var TaskList []*taskItem
@@ -37,16 +38,26 @@ func Load() {
 		TaskList = append(TaskList, task)
 	}
 
-	bootstrap(TaskList)
+	for {
+		taskCount := len(TaskList)
+		c := make(chan bool, taskCount)
+		for _, taskItem := range TaskList {
+			go goTask(taskItem, c)
+		}
+
+		for i := 0; i < taskCount; i++ {
+			<-c
+		}
+		time.Sleep(time.Millisecond * 200)
+	}
 }
 
-func bootstrap(TaskList []*taskItem) {
-	for {
-		for _, taskItem := range TaskList {
-			if taskItem.checkTime() {
-				taskItem.exec()
-			}
-		}
+func goTask(t *taskItem, c chan bool) {
+	on := false
+	if t.checkTime() {
+		t.exec()
+		on = true
 	}
 
+	c <- on
 }

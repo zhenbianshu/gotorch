@@ -7,6 +7,7 @@ import (
 type taskItem struct {
 	times map[int][]int
 	attr  attr
+	last  int64
 }
 
 const (
@@ -29,8 +30,14 @@ func (t *taskItem) isOn(order int, timePoint int) bool {
 
 func (t *taskItem) checkTime() bool {
 	current := time.Now()
-	curTime := make(map[int]int)
+	curTimestamp := current.Unix()
 
+	// 检查是否在当前时间被执行过
+	if t.last >= curTimestamp {
+		return false
+	}
+
+	curTime := make(map[int]int)
 	curTime[second] = current.Second()
 	curTime[minute] = current.Minute()
 	curTime[hour] = current.Hour()
@@ -44,9 +51,10 @@ func (t *taskItem) checkTime() bool {
 		}
 	}
 
+	t.last = curTimestamp
 	return true
 }
 
 func (t *taskItem) exec() {
-
+	// exec.Command(t.attr.Script)
 }
