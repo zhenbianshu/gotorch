@@ -34,11 +34,19 @@ func Load() {
 			fmt.Print(errDesc)
 			os.Exit(1)
 		}
-		task.init()
-		AddTask(task)
+		TaskList = append(TaskList, task)
 	}
+
+	bootstrap(TaskList)
 }
 
-func AddTask(task *taskItem) {
-	TaskList = append(TaskList, task)
+func bootstrap(TaskList []*taskItem) {
+	for {
+		for _, taskItem := range TaskList {
+			if taskItem.checkTime() {
+				taskItem.exec()
+			}
+		}
+	}
+
 }
