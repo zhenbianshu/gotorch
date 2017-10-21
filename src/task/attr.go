@@ -15,8 +15,6 @@ type attr struct {
 	Ips      []string
 }
 
-var timeType = []string{"second", "minute", "hour", "day", "month", "week"}
-
 func (a attr) timeValid() (isValid bool, errDesc string) {
 	times := strings.Split(a.Times, " ")
 	if len(times) != 6 {
@@ -47,18 +45,15 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 	if isValid, errDesc := a.timeValid(); !isValid {
 		return nil, errDesc
 	}
-	// todo check command executable
 
-	var mapKey string
-	times := make(map[string][]timeRange)
+	times := make(map[int][]int)
 	timeConf := strings.Split(a.Times, " ")
 	for index, argStr := range timeConf {
-		mapKey = timeType[index]
 		limitList, err := parseTimeRange(argStr, index)
 		if err != nil {
 			return nil, err.Error()
 		}
-		times[mapKey] = limitList
+		times[index] = limitList
 	}
 	taskInstance := taskItem{times: times, attr: a}
 	return &taskInstance, ""
@@ -74,76 +69,66 @@ func inRange(num int, index int) bool {
 	return valid
 }
 
-func parseTimeRange(argStr string, index int) ([]timeRange, error) {
+func parseTimeRange(argStr string, index int) ([]int, error) {
 	parseErr := errors.New("time range parse error")
+
+	points := []int{}
 	argParts := strings.Split(argStr, ",")
-	limitList := make([]timeRange, 0)
 	for _, argPart := range argParts {
 		eachArg := strings.Split(argPart, "/")
 		if len(eachArg) > 2 {
-			return []timeRange{}, parseErr
+			return []int{}, parseErr
 		}
 
-		limit := timeRange{}
+		var every int
 		if len(eachArg) == 1 {
-			limit.every = 1
+			every = 1
 		} else {
-			every, err := strconv.Atoi(eachArg[1])
-			if err != nil {
-				return []timeRange{}, parseErr
-			}
-			limit.every = every
+			every, _ = strconv.Atoi(eachArg[1])
 		}
 
+		var start, end int
 		if strings.IndexAny(eachArg[0], "-") >= 0 {
 			numRange := strings.Split(argStr, "-")
 			if len(numRange) != 2 {
-				return []timeRange{}, parseErr
+				return []int{}, parseErr
 			}
 
-			start, tErr := strconv.Atoi(numRange[0])
-			end, dErr := strconv.Atoi(numRange[0])
-			if tErr != nil || dErr != nil {
-				return []timeRange{}, parseErr
-			}
-			limit.start = start
-			limit.end = end
+			start, _ = strconv.Atoi(numRange[0])
+			end, _ = strconv.Atoi(numRange[0])
 		} else if eachArg[0] == "*" {
-			start, end := getRange(index)
-			limit.start = start
-			limit.end = end
+			start, end = getRange(index)
 		} else {
-			num, err := strconv.Atoi(eachArg[0])
-			if err != nil {
-				return []timeRange{}, parseErr
-			}
-			limit.start = num
-			limit.end = num
+			num, _ := strconv.Atoi(eachArg[0])
+			start = num
+			end = num
 		}
-		limitList = append(limitList, limit)
+
+		for ; start < end; start += every {
+			points = append(points, start)
+		}
 	}
 
-	return limitList, nil
+	return points, nil
 }
 
 func getRange(index int) (start, end int) {
 	switch index {
-	case 0, 1:
+	case second, minute:
 		start = 0
 		end = 59
-	case 2:
+	case hour:
 		start = 0
 		end = 23
-
-	case 3:
+	case day:
 		start = 1
 		end = 31
-	case 4:
-		start = 1
-		end = 12
-	case 5:
+	case week:
 		start = 1
 		end = 7
+	case month:
+		start = 1
+		end = 12
 	default:
 		start = 0
 		end = 0
