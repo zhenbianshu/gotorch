@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -39,25 +40,21 @@ func Load() {
 	}
 
 	for {
-		taskCount := len(TaskList)
-		c := make(chan bool, taskCount)
+		wg := sync.WaitGroup{}
 		for _, taskItem := range TaskList {
-			go goTask(taskItem, c)
+			wg.Add(1)
+			go goTask(taskItem, wg)
 		}
 
-		for i := 0; i < taskCount; i++ {
-			<-c
-		}
+		wg.Wait()
 		time.Sleep(time.Millisecond * 200)
 	}
 }
 
-func goTask(t *taskItem, c chan bool) {
-	on := false
+func goTask(t *taskItem, wg sync.WaitGroup) {
 	if t.checkTime() {
 		t.exec()
-		on = true
 	}
 
-	c <- on
+	wg.Done()
 }
