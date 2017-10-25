@@ -1,6 +1,6 @@
 [
   {
-    "Script": "",
+    "Command": "",
     "TaskType": "daemon",
     "Times": "3 * * * * *",
     "Max": 3,
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "Script": "",
+    "Command": "",
     "TaskType": "common",
     "Times": "* 2-4 * * * *",
     "Max": 1,

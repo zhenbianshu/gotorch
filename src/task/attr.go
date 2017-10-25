@@ -8,7 +8,7 @@ import (
 )
 
 type attr struct {
-	Script   string
+	Command  string
 	TaskType string
 	Times    string
 	Max      int
@@ -55,7 +55,13 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 		}
 		times[index] = limitList
 	}
-	taskInstance := taskItem{times: times, attr: a}
+
+	cmdArgs := strings.Split(a.Command, " ")
+	cmd := cmdArgs[0]
+	args := cmdArgs[1:]
+
+	taskInstance := taskItem{times: times, attr: a, cmd: cmd, args: args}
+
 	return &taskInstance, ""
 }
 
