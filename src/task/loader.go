@@ -31,9 +31,9 @@ func Load() {
 	}
 
 	for _, attr := range taskConfigs {
-		task, errDesc := attr.buildTask()
+		task, err := attr.buildTask()
 		if task == nil {
-			fmt.Print(errDesc)
+			fmt.Print(err.Error())
 			os.Exit(1)
 		}
 		TaskList = append(TaskList, task)

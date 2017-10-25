@@ -15,10 +15,11 @@ type attr struct {
 	Ips      []string
 }
 
-func (a attr) timeValid() (isValid bool, errDesc string) {
+func (a attr) timeValid() (isValid bool, err error) {
 	times := strings.Split(a.Times, " ")
 	if len(times) != 6 {
-		return false, "time format error!"
+		err = errors.New("time format error")
+		return false, err
 	}
 
 	for index, argStr := range times {
@@ -27,23 +28,25 @@ func (a attr) timeValid() (isValid bool, errDesc string) {
 		}
 
 		if ok, _ := regexp.MatchString(`[^*|\-|,|/|a-zA-Z0-9]`, argStr); ok {
-			return false, "undefined character!"
+			err = errors.New("undefined character")
+			return false, err
 		}
 
 		rex, _ := regexp.Compile(`\d`)
 		args := rex.FindAllString(argStr, -1)
 		for argNum := range args {
 			if !inRange(int(argNum), index) {
-				return false, "time num out of range"
+				err = errors.New("time num out of range")
+				return false, err
 			}
 		}
 	}
-	return true, ""
+	return true, nil
 }
 
-func (a attr) buildTask() (task *taskItem, errDesc string) {
-	if isValid, errDesc := a.timeValid(); !isValid {
-		return nil, errDesc
+func (a attr) buildTask() (task *taskItem, err error) {
+	if isValid, err := a.timeValid(); !isValid {
+		return nil, err
 	}
 
 	times := make(map[int][]int)
@@ -51,7 +54,7 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 	for index, argStr := range timeConf {
 		limitList, err := parseTimeRange(argStr, index)
 		if err != nil {
-			return nil, err.Error()
+			return nil, err
 		}
 		times[index] = limitList
 	}
@@ -62,7 +65,7 @@ func (a attr) buildTask() (task *taskItem, errDesc string) {
 
 	taskInstance := taskItem{times: times, attr: a, cmd: cmd, args: args}
 
-	return &taskInstance, ""
+	return &taskInstance, nil
 }
 
 func inRange(num int, index int) bool {
