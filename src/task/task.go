@@ -1,13 +1,19 @@
 package task
 
 import (
+	"logger"
+	"os/exec"
+	"sync"
 	"time"
 )
 
 type taskItem struct {
-	times map[int][]int
-	attr  attr
-	last  int64
+	times   map[int][]int
+	attr    attr
+	last    int64
+	working int
+	cmd     string
+	args    []string
 }
 
 const (
@@ -19,6 +25,9 @@ const (
 	month
 )
 
+/**
+ * 判断某个时间单位是否符合
+ */
 func (t *taskItem) isOn(order int, timePoint int) bool {
 	for _, num := range t.times[order] {
 		if num == timePoint {
@@ -28,11 +37,39 @@ func (t *taskItem) isOn(order int, timePoint int) bool {
 	return false
 }
 
+/**
+ * 检查执行条件
+ */
+func (t *taskItem) checkCond() bool {
+	if !t.checkTime() {
+		return false
+	}
+
+	if !t.checkMax() {
+		return false
+	}
+
+	return true
+}
+
+/**
+ * 检查当前执行最大进程数
+ */
+func (t *taskItem) checkMax() bool {
+	if t.attr.Max > 0 && t.working <= t.attr.Max {
+		return false
+	}
+	return true
+
+}
+
+/**
+ * 检查执行时间
+ */
 func (t *taskItem) checkTime() bool {
 	current := time.Now()
 	curTimestamp := current.Unix()
 
-	// 检查是否在当前时间被执行过
 	if t.last >= curTimestamp {
 		return false
 	}
@@ -51,10 +88,25 @@ func (t *taskItem) checkTime() bool {
 		}
 	}
 
-	t.last = curTimestamp
 	return true
 }
 
-func (t *taskItem) exec() {
-	// exec.Command(t.attr.Script)
+/**
+ * 执行命令
+ */
+func (t *taskItem) exec(wg sync.WaitGroup) {
+	t.last = time.Now().Unix()
+
+	cmd := exec.Command(t.cmd, t.args...)
+	err := cmd.Start()
+	wg.Done()
+	if err != nil {
+		logger.Error(t.attr.Command + " : " + err.Error())
+		return
+	}
+
+	t.working++
+
+	cmd.Wait()
+	t.working--
 }

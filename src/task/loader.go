@@ -43,18 +43,12 @@ func Load() {
 		wg := sync.WaitGroup{}
 		for _, taskItem := range TaskList {
 			wg.Add(1)
-			go goTask(taskItem, wg)
+			if taskItem.checkCond() {
+				go taskItem.exec(wg)
+			}
 		}
 
 		wg.Wait()
 		time.Sleep(time.Millisecond * 200)
 	}
-}
-
-func goTask(t *taskItem, wg sync.WaitGroup) {
-	if t.checkTime() {
-		t.exec()
-	}
-
-	wg.Done()
 }
