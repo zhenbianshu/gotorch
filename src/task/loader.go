@@ -42,9 +42,9 @@ func Load() {
 	for {
 		wg := sync.WaitGroup{}
 		for _, taskItem := range TaskList {
-			wg.Add(1)
 			if taskItem.checkCond() {
-				go taskItem.exec(wg)
+				wg.Add(1)
+				go taskItem.exec(&wg)
 			}
 		}
 
