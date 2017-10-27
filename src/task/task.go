@@ -8,12 +8,12 @@ import (
 )
 
 type taskItem struct {
-	times   map[int][]int
-	attr    attr
-	last    int64
-	working int
-	cmd     string
-	args    []string
+	times map[int][]int
+	attr  attr
+	last  int64
+	cmd   string
+	args  []string
+	pids  []int
 }
 
 const (
@@ -56,7 +56,7 @@ func (t *taskItem) checkCond() bool {
  * 检查当前执行最大进程数
  */
 func (t *taskItem) checkMax() bool {
-	if t.attr.Max > 0 && t.working <= t.attr.Max {
+	if t.attr.Max > 0 && len(t.pids) <= t.attr.Max {
 		return false
 	}
 	return true
@@ -104,9 +104,12 @@ func (t *taskItem) exec(wg sync.WaitGroup) {
 		logger.Error(t.attr.Command + " : " + err.Error())
 		return
 	}
-
-	t.working++
+	t.pids = append(t.pids, cmd.Process.Pid)
 
 	cmd.Wait()
-	t.working--
+	for index, pid := range t.pids {
+		if pid == cmd.Process.Pid {
+			t.pids = append(t.pids[:index-1], t.pids[:index]...)
+		}
+	}
 }
