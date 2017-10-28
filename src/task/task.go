@@ -4,6 +4,7 @@ import (
 	"logger"
 	"os/exec"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -111,5 +112,14 @@ func (t *taskItem) exec(wg *sync.WaitGroup) {
 		if pid == cmd.Process.Pid {
 			t.pids = append(t.pids[:index-1], t.pids[:index]...)
 		}
+	}
+}
+
+/**
+ * 清理进程
+ */
+func (t *taskItem) clearTask() {
+	for _, pid := range t.pids {
+		syscall.Kill(pid, syscall.SIGKILL)
 	}
 }

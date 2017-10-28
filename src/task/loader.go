@@ -63,9 +63,14 @@ func load(fileData []byte) {
 	}
 
 	for _, attr := range taskConfigs {
-		if TaskList[attr.Command] != nil && reflect.DeepEqual(TaskList[attr.Command].attr, attr) {
-			continue
+		if TaskList[attr.Command] != nil {
+			if reflect.DeepEqual(TaskList[attr.Command].attr, attr) {
+				continue
+			} else {
+				TaskList[attr.Command].clearTask()
+			}
 		}
+
 		task, err := attr.buildTask()
 		if task == nil {
 			fmt.Print(err.Error())
