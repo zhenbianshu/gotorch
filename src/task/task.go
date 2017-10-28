@@ -92,6 +92,18 @@ func (t *taskItem) checkTime() bool {
 	return true
 }
 
+func (t *taskItem) checkIp() bool {
+	if len(t.attr.Ips) < 1 {
+		return true
+	}
+	for _, ip := range t.attr.Ips {
+		if ip == localIp {
+			return true
+		}
+	}
+	return false
+}
+
 /**
  * 执行命令
  */

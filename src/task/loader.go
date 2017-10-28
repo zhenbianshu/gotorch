@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"reflect"
 	"sync"
@@ -13,7 +14,24 @@ import (
 
 var TaskList map[string]*taskItem
 var configMd5 [16]byte
+var localIp string
 
+func Init() {
+	TaskList = make(map[string]*taskItem)
+
+	addrs, _ := net.InterfaceAddrs()
+	for _, addr := range addrs {
+		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				localIp = ipNet.IP.String()
+			}
+		}
+	}
+}
+
+/**
+ * 运行
+ */
 func Run() {
 	fileData := readFile()
 	if !checkMd5(fileData) {
@@ -31,6 +49,9 @@ func Run() {
 	wg.Wait()
 }
 
+/**
+ * 读取配置文件
+ */
 func readFile() []byte {
 	tasksFileName := config.GetConfig("tasks")
 
@@ -45,6 +66,9 @@ func readFile() []byte {
 	return fileData
 }
 
+/**
+ * 校验配置文件MD5
+ */
 func checkMd5(fileData []byte) bool {
 	sum := md5.Sum(fileData)
 	if len(configMd5) > 0 && sum != configMd5 {
@@ -54,6 +78,9 @@ func checkMd5(fileData []byte) bool {
 	return true
 }
 
+/**
+ * 加载配置
+ */
 func load(fileData []byte) {
 	taskConfigs := make([]attr, 0)
 	err := json.Unmarshal(fileData, &taskConfigs)
@@ -77,9 +104,6 @@ func load(fileData []byte) {
 			os.Exit(1)
 		}
 
-		if TaskList == nil {
-			TaskList = make(map[string]*taskItem)
-		}
 		TaskList[task.attr.Command] = task
 	}
 }
