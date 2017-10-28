@@ -4,9 +4,9 @@ a task management system written in go
 
 #TodoList
 
-- phrase 1
+- phrase 1  // 已实现
     
-    仿 unix crontab, 添加 秒级实现
+    仿 unix crontab, 添加 秒级实现 
 
 - phrase 2
 

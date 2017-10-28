@@ -16,6 +16,9 @@ var TaskList map[string]*taskItem
 var configMd5 [16]byte
 var localIp string
 
+/**
+ * 初始化
+ */
 func Init() {
 	TaskList = make(map[string]*taskItem)
 
@@ -71,7 +74,7 @@ func readFile() []byte {
  */
 func checkMd5(fileData []byte) bool {
 	sum := md5.Sum(fileData)
-	if len(configMd5) > 0 && sum != configMd5 {
+	if sum != configMd5 {
 		return false
 	}
 

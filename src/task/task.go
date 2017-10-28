@@ -50,6 +50,10 @@ func (t *taskItem) checkCond() bool {
 		return false
 	}
 
+	if !t.checkIp() {
+		return false
+	}
+
 	return true
 }
 
@@ -57,7 +61,7 @@ func (t *taskItem) checkCond() bool {
  * 检查当前执行最大进程数
  */
 func (t *taskItem) checkMax() bool {
-	if t.attr.Max > 0 && len(t.pids) <= t.attr.Max {
+	if t.attr.Max > 0 && len(t.pids) >= t.attr.Max {
 		return false
 	}
 	return true
@@ -96,11 +100,13 @@ func (t *taskItem) checkIp() bool {
 	if len(t.attr.Ips) < 1 {
 		return true
 	}
+
 	for _, ip := range t.attr.Ips {
 		if ip == localIp {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -122,7 +128,7 @@ func (t *taskItem) exec(wg *sync.WaitGroup) {
 	cmd.Wait()
 	for index, pid := range t.pids {
 		if pid == cmd.Process.Pid {
-			t.pids = append(t.pids[:index-1], t.pids[:index]...)
+			t.pids = append(t.pids[:index], t.pids[:index]...)
 		}
 	}
 }

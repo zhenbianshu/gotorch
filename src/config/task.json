@@ -1,11 +1,11 @@
 [
   {
-    "Command": "",
+    "Command": "/usr/local/php5/bin/php /tmp/test.php",
     "TaskType": "daemon",
-    "Times": "3 * * * * *",
+    "Times": "*/3 * * * * *",
     "Max": 3,
     "Ips": [
-      "172.16.18.10",
+      "192.168.1.9",
       "172.16.18.16"
     ]
   },
