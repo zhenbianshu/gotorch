@@ -1,7 +1,13 @@
 package main
 
-import "task"
+import (
+	"task"
+	"time"
+)
 
 func main() {
-	task.Load()
+	for {
+		task.Run()
+		time.Sleep(time.Millisecond * 200)
+	}
 }

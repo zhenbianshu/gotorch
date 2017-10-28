@@ -94,7 +94,7 @@ func (t *taskItem) checkTime() bool {
 /**
  * 执行命令
  */
-func (t *taskItem) exec(wg sync.WaitGroup) {
+func (t *taskItem) exec(wg *sync.WaitGroup) {
 	t.last = time.Now().Unix()
 
 	cmd := exec.Command(t.cmd, t.args...)
