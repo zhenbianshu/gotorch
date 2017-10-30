@@ -92,6 +92,18 @@ func load(fileData []byte) {
 		os.Exit(1)
 	}
 
+	for _, oldTask := range TaskList {
+		for _, newAttr := range taskConfigs {
+			if oldTask.attr.Command == newAttr.Command {
+				goto GoOn
+			}
+		}
+
+		oldTask.clearTask()
+		delete(TaskList, oldTask.attr.Command)
+	GoOn:
+	}
+
 	for _, attr := range taskConfigs {
 		if TaskList[attr.Command] != nil {
 			if reflect.DeepEqual(TaskList[attr.Command].attr, attr) {
