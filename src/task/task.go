@@ -42,10 +42,6 @@ func (t *taskItem) isOn(order int, timePoint int) bool {
  * 检查执行条件
  */
 func (t *taskItem) checkCond() bool {
-	if !t.checkTime() {
-		return false
-	}
-
 	if !t.checkMax() {
 		return false
 	}
@@ -54,7 +50,23 @@ func (t *taskItem) checkCond() bool {
 		return false
 	}
 
+	if t.checkType() {
+		return true
+	}
+
+	if !t.checkTime() {
+		return false
+	}
+
 	return true
+}
+
+func (t *taskItem) checkType() bool {
+	if t.attr.TaskType == TypeDaemon {
+		return true
+	}
+
+	return false
 }
 
 /**

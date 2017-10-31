@@ -15,6 +15,9 @@ type attr struct {
 	Ips      []string
 }
 
+const TypeDaemon = "daemon"
+const TypeCommon = "common"
+
 func (a attr) timeValid() (isValid bool, err error) {
 	times := strings.Split(a.Times, " ")
 	if len(times) != 6 {
