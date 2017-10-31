@@ -50,7 +50,7 @@ func (t *taskItem) checkCond() bool {
 		return false
 	}
 
-	if t.checkType() {
+	if t.isDaemon() {
 		return true
 	}
 
@@ -61,7 +61,7 @@ func (t *taskItem) checkCond() bool {
 	return true
 }
 
-func (t *taskItem) checkType() bool {
+func (t *taskItem) isDaemon() bool {
 	if t.attr.TaskType == TypeDaemon {
 		return true
 	}
