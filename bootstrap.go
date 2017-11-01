@@ -12,6 +12,7 @@ const Version = "0.9"
 func main() {
 	dealCliArgs()
 	task.Init()
+	// todo 启动后台进程
 	for {
 		task.Run()
 		time.Sleep(time.Millisecond * 200)
@@ -19,13 +20,18 @@ func main() {
 }
 
 func dealCliArgs() {
+	if len(os.Args) <= 1 {
+		fmt.Println("unknown parameter, use -h or --help to get help!")
+		os.Exit(0)
+	}
+
 	bootType := os.Args[1]
 	if bootType == "-s" || bootType == "--start" {
 		return
 	} else if bootType == "-r" || bootType == "--restart" {
 		// task.Reload()
 	} else if bootType == "-e" || bootType == "--end" {
-		// task.End()
+		task.End()
 	} else if bootType == "-v" || bootType == "--version" {
 		fmt.Println("CopyRight @zhenbianshu V" + Version)
 	} else if bootType == "-h" || bootType == "--help" {

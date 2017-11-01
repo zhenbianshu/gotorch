@@ -2,7 +2,6 @@ package config
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -17,7 +16,6 @@ type conf struct {
 func newConf() *conf {
 	rootPath, _ := os.Getwd()
 	file, err := os.Open(rootPath + "/src/config/gotask.ini")
-	fmt.Println(rootPath + "/config/gotask.ini")
 	if err != nil {
 		os.Exit(222)
 	}

@@ -9,7 +9,9 @@ import (
 	"net"
 	"os"
 	"reflect"
+	"strconv"
 	"sync"
+	"syscall"
 )
 
 var TaskList map[string]*taskItem
@@ -50,6 +52,17 @@ func Run() {
 	}
 
 	wg.Wait()
+}
+
+func End() {
+	pidFile := config.GetConfig("pid_file")
+	pidStr, err := ioutil.ReadFile(pidFile)
+	if err != nil {
+		fmt.Println("Error read pid file!")
+		os.Exit(2)
+	}
+	pid, _ := strconv.Atoi(string(pidStr))
+	syscall.Kill(pid, syscall.SIGKILL)
 }
 
 /**
