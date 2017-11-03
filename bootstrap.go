@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 	"task"
 	"time"
 )
@@ -50,10 +52,22 @@ func bootStrap() {
 		return
 	}
 
-	// todo 注册信号量处理函数
+	go listenSignal()
+
 	task.Init()
 	for {
 		task.Run()
 		time.Sleep(time.Millisecond * 200)
+	}
+}
+
+func listenSignal() {
+	c := make(chan os.Signal)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGKILL)
+	for {
+		s := <-c
+		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
+			task.End()
+		}
 	}
 }

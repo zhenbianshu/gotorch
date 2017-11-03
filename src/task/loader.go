@@ -62,7 +62,7 @@ func End() {
 		os.Exit(2)
 	}
 	pid, _ := strconv.Atoi(string(pidStr))
-	syscall.Kill(pid, syscall.SIGKILL)
+	syscall.Kill(pid, syscall.SIGTERM)
 }
 
 /**
