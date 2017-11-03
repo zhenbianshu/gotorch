@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"common"
 	"config"
 	"encoding/json"
 	"os"
@@ -23,11 +24,11 @@ func getLogWriter() *writer {
 
 func (l *writer) setLogFile(level string) {
 	logDirConfig := config.GetConfig("log_dir")
-	logDir := logDirConfig + getPkgName() + "/"
-	if !isDirExist(logDir) {
+	logDir := logDirConfig + common.GetPkgName() + "/"
+	if !common.IsDirExist(logDir) {
 		os.MkdirAll(logDir, 0777)
 	}
-	fileName := getFileName() + "_" + level + ".log"
+	fileName := common.GetFileName() + "_" + level + ".log"
 	l.file = logDir + fileName
 }
 
