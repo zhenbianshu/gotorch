@@ -9,7 +9,6 @@ import (
 	"net"
 	"os"
 	"reflect"
-	"strconv"
 	"sync"
 	"syscall"
 )
@@ -55,14 +54,12 @@ func Run() {
 }
 
 func End() {
-	pidFile := config.GetConfig("pid_file")
-	pidStr, err := ioutil.ReadFile(pidFile)
-	if err != nil {
-		fmt.Println("Error read pid file!")
-		os.Exit(2)
+	for _, taskItem := range TaskList {
+		taskItem.clearTask()
 	}
-	pid, _ := strconv.Atoi(string(pidStr))
-	syscall.Kill(pid, syscall.SIGTERM)
+
+	pidFile := config.GetConfig("pid_file")
+	syscall.Unlink(pidFile)
 }
 
 /**

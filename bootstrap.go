@@ -1,11 +1,14 @@
 package main
 
 import (
+	"common"
+	"config"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"syscall"
 	"task"
 	"time"
@@ -52,6 +55,7 @@ func bootStrap() {
 		return
 	}
 
+	go savePid()
 	go listenSignal()
 
 	task.Init()
@@ -63,11 +67,22 @@ func bootStrap() {
 
 func listenSignal() {
 	c := make(chan os.Signal)
-	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGKILL)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT)
 	for {
 		s := <-c
 		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
 			task.End()
 		}
 	}
+}
+
+func savePid() {
+	pidFile := config.GetConfig("pid_file")
+	if common.IsFileExist(pidFile) {
+		fmt.Println("pid file already exist!")
+		os.Exit(1)
+	}
+
+	file, _ := os.OpenFile(pidFile, os.O_WRONLY|os.O_CREATE, 0644)
+	file.Write([]byte(strconv.Itoa(os.Getpid())))
 }
