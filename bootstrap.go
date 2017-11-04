@@ -4,6 +4,7 @@ import (
 	"common"
 	"config"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -26,7 +27,7 @@ func main() {
 	if bootType == "-s" || bootType == "--start" {
 		bootStrap()
 	} else if bootType == "-r" || bootType == "--restart" {
-		// task.Reload()
+		Reload()
 	} else if bootType == "-e" || bootType == "--end" {
 		task.End()
 	} else if bootType == "-v" || bootType == "--version" {
@@ -72,6 +73,9 @@ func listenSignal() {
 		s := <-c
 		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
 			task.End()
+		} else if s == syscall.SIGUSR2 {
+			task.End()
+			bootStrap()
 		}
 	}
 }
@@ -85,4 +89,16 @@ func savePid() {
 
 	file, _ := os.OpenFile(pidFile, os.O_WRONLY|os.O_CREATE, 0644)
 	file.Write([]byte(strconv.Itoa(os.Getpid())))
+}
+
+func Reload() {
+	pidFile := config.GetConfig("pid_file")
+	if !common.IsFileExist(pidFile) {
+		fmt.Println("no service running!")
+		os.Exit(1)
+	}
+
+	pidStr, _ := ioutil.ReadFile(pidFile)
+	pid, _ := strconv.Atoi(string(pidStr))
+	syscall.Kill(pid, syscall.SIGUSR2)
 }
