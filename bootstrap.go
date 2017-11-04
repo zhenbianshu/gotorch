@@ -25,7 +25,7 @@ func main() {
 
 	bootType := os.Args[1]
 	if bootType == "-s" || bootType == "--start" {
-		bootStrap()
+		bootStrap(false)
 	} else if bootType == "-r" || bootType == "--restart" {
 		Reload()
 	} else if bootType == "-e" || bootType == "--end" {
@@ -44,9 +44,9 @@ func main() {
 	os.Exit(0)
 }
 
-func bootStrap() {
+func bootStrap(force bool) {
 	// 启动后台进程
-	if os.Getppid() != 1 {
+	if os.Getppid() != 1 || force {
 		filePath, _ := filepath.Abs(os.Args[0])
 		cmd := exec.Command(filePath, os.Args[1:]...)
 		cmd.Stdin = os.Stdin
@@ -75,7 +75,7 @@ func listenSignal() {
 			task.End()
 		} else if s == syscall.SIGUSR2 {
 			task.End()
-			bootStrap()
+			bootStrap(true)
 		}
 	}
 }
