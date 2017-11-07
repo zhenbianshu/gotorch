@@ -56,8 +56,8 @@ func bootStrap(force bool) {
 		return
 	}
 
-	go savePid()
-	go listenSignal()
+	savePid()
+	listenSignal()
 
 	task.Init()
 	for {
@@ -69,7 +69,8 @@ func bootStrap(force bool) {
 func listenSignal() {
 	c := make(chan os.Signal)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT)
-	for {
+
+	go func() {
 		s := <-c
 		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
 			task.End()
@@ -77,7 +78,7 @@ func listenSignal() {
 			task.End()
 			bootStrap(true)
 		}
-	}
+	}()
 }
 
 func savePid() {
