@@ -27,9 +27,9 @@ func main() {
 	if bootType == "-s" || bootType == "--start" {
 		bootStrap(false)
 	} else if bootType == "-r" || bootType == "--restart" {
-		Reload()
+		reload()
 	} else if bootType == "-e" || bootType == "--end" {
-		task.End()
+		end()
 	} else if bootType == "-v" || bootType == "--version" {
 		fmt.Println("CopyRight @zhenbianshu V" + Version)
 	} else if bootType == "-h" || bootType == "--help" {
@@ -74,6 +74,7 @@ func listenSignal() {
 		s := <-c
 		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
 			task.End()
+			os.Exit(0)
 		} else if s == syscall.SIGUSR2 {
 			task.End()
 			bootStrap(true)
@@ -92,7 +93,17 @@ func savePid() {
 	file.Write([]byte(strconv.Itoa(os.Getpid())))
 }
 
-func Reload() {
+func reload() {
+	pid := getPid()
+	syscall.Kill(pid, syscall.SIGUSR2)
+}
+
+func end()  {
+	pid:=getPid()
+	syscall.Kill(pid, syscall.SIGTERM)
+}
+
+func getPid() int {
 	pidFile := config.GetConfig("pid_file")
 	if !common.IsFileExist(pidFile) {
 		fmt.Println("no service running!")
@@ -101,5 +112,6 @@ func Reload() {
 
 	pidStr, _ := ioutil.ReadFile(pidFile)
 	pid, _ := strconv.Atoi(string(pidStr))
-	syscall.Kill(pid, syscall.SIGUSR2)
+
+	return pid
 }

@@ -1,13 +1,5 @@
 package logger
 
-import (
-	"bufio"
-	"bytes"
-	"os"
-	"runtime"
-	"strings"
-)
-
 const LOG_LEVEL_DEBUG = "debug"
 const LOG_LEVEL_WARNING = "warning"
 const LOG_LEVEL_ERROR = "error"
