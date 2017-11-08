@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"sync"
 	"syscall"
+	"logger"
+	"strconv"
 )
 
 var TaskList map[string]*taskItem
@@ -37,7 +39,8 @@ func Init() {
  * 运行
  */
 func Run() {
-	fileData := readFile()
+	tasksFile := config.GetConfig("tasks")
+	fileData := readFile(tasksFile)
 	if !checkMd5(fileData) {
 		load(fileData)
 	}
@@ -60,18 +63,18 @@ func End() {
 
 	pidFile := config.GetConfig("pid_file")
 	syscall.Unlink(pidFile)
+	logger.Debug(map[string]string{"bootstrap": "service end, pid" + strconv.Itoa(os.Getpid())})
 }
 
 /**
  * 读取配置文件
  */
-func readFile() []byte {
-	tasksFileName := config.GetConfig("tasks")
-
-	fileHandler, err := os.Open(tasksFileName)
+func readFile(fileName string) []byte {
+	fileHandler, err := os.Open(fileName)
 
 	if err != nil {
 		fmt.Println("can't find the tasks file!")
+		logger.Error("can't find the tasks file" + err.Error())
 		os.Exit(1)
 	}
 	fileData, _ := ioutil.ReadAll(fileHandler)
@@ -99,6 +102,7 @@ func load(fileData []byte) {
 	err := json.Unmarshal(fileData, &taskConfigs)
 	if err != nil {
 		fmt.Println("task config parse error: " + err.Error())
+		logger.Error("task config parse error: " + err.Error())
 		os.Exit(1)
 	}
 
@@ -126,6 +130,7 @@ func load(fileData []byte) {
 		task, err := attr.buildTask()
 		if task == nil {
 			fmt.Print(err.Error())
+			logger.Error(err.Error())
 			os.Exit(1)
 		}
 
