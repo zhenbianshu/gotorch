@@ -1,5 +1,5 @@
 # gotorch
-a task management system written in go
+a multi-server task management system written in go
 
 
 #TodoList

@@ -13,16 +13,25 @@ import (
 	"syscall"
 	"logger"
 	"strconv"
+	"time"
 )
 
 var TaskList map[string]*taskItem
 var configMd5 [16]byte
 var localIp string
+var CheckInterval time.Duration
 
 /**
  * 初始化
  */
 func Init() {
+	var err error
+	CheckInterval, err = time.ParseDuration(config.GetConfig("interval"))
+	if err != nil {
+		logger.Warning(map[string]string{"warning": "no interval config, use default"})
+		CheckInterval = 100
+	}
+	
 	TaskList = make(map[string]*taskItem)
 
 	addrs, _ := net.InterfaceAddrs()
