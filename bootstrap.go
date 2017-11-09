@@ -22,9 +22,12 @@ const Version = "0.9"
 func main() {
 	defer globalRecover()
 
-	var signalOption = flag.String("s", "", "start service")
+	var signalOption = flag.String("s", "", `start: 		start the service
+	end: 		stop the running service
+	restart:	restart the running service`)
 	var helpFlag = flag.Bool("h", false, "show options")
 	var versionFlag = flag.Bool("v", false, "show service version")
+	flag.Parse()
 
 	if *versionFlag {
 		fmt.Println("CopyRight @zhenbianshu V" + Version)
@@ -35,18 +38,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	if signalOption !=nil {
+	if *signalOption != "" {
 		if *signalOption == "start" {
 			bootStrap(false)
-		}else if *signalOption == "end" {
+		} else if *signalOption == "end" {
 			end()
-		}else if *signalOption == "restart"{
+		} else if *signalOption == "restart" {
 			reload()
 		}
+		return
 	}
 
 	fmt.Println("unknown option, use -h option to get help!")
 	os.Exit(0)
+
 }
 
 func bootStrap(force bool) {
@@ -128,7 +133,7 @@ func getRunningPid() int {
 func globalRecover() {
 	if p := recover(); p != nil {
 		fmt.Printf("error: %s\n", p)
-		logger.Error("unexpected quit: "+fmt.Sprintf("%s", p))
+		logger.Error("unexpected quit: " + fmt.Sprintf("%s", p))
 		os.Exit(1)
 	}
 }
