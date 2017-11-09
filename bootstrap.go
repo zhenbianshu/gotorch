@@ -14,34 +14,38 @@ import (
 	"task"
 	"time"
 	"logger"
+	"flag"
 )
 
 const Version = "0.9"
 
 func main() {
-	if len(os.Args) <= 1 {
-		fmt.Println("unknown parameter, use -h or --help to get help!")
+	defer globalRecover()
+
+	var signalOption = flag.String("s", "", "start service")
+	var helpFlag = flag.Bool("h", false, "show options")
+	var versionFlag = flag.Bool("v", false, "show service version")
+
+	if *versionFlag {
+		fmt.Println("CopyRight @zhenbianshu V" + Version)
+		os.Exit(0)
+	}
+	if *helpFlag {
+		flag.PrintDefaults()
 		os.Exit(0)
 	}
 
-	bootType := os.Args[1]
-	if bootType == "-s" || bootType == "--start" {
-		bootStrap(false)
-	} else if bootType == "-r" || bootType == "--restart" {
-		reload()
-	} else if bootType == "-e" || bootType == "--end" {
-		end()
-	} else if bootType == "-v" || bootType == "--version" {
-		fmt.Println("CopyRight @zhenbianshu V" + Version)
-	} else if bootType == "-h" || bootType == "--help" {
-		fmt.Println("-s --start 启动服务")
-		fmt.Println("-e --end 关闭服务")
-		fmt.Println("-r --restart 平滑重启服务")
-		fmt.Println("-v --version 查看服务版本")
-		fmt.Println("-h --help 查看帮助")
-	} else {
-		fmt.Println("unknown parameter, use -h or --help to get help!")
+	if signalOption !=nil {
+		if *signalOption == "start" {
+			bootStrap(false)
+		}else if *signalOption == "end" {
+			end()
+		}else if *signalOption == "restart"{
+			reload()
+		}
 	}
+
+	fmt.Println("unknown option, use -h option to get help!")
 	os.Exit(0)
 }
 
@@ -119,4 +123,12 @@ func getRunningPid() int {
 	pid, _ := strconv.Atoi(string(pidStr))
 
 	return pid
+}
+
+func globalRecover() {
+	if p := recover(); p != nil {
+		fmt.Printf("error: %s\n", p)
+		logger.Error("unexpected quit: "+fmt.Sprintf("%s", p))
+		os.Exit(1)
+	}
 }
