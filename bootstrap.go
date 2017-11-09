@@ -15,6 +15,8 @@ import (
 	"time"
 	"logger"
 	"flag"
+	"errors"
+	"stat"
 )
 
 const Version = "0.9"
@@ -45,6 +47,8 @@ func main() {
 			end()
 		} else if *signalOption == "restart" {
 			reload()
+		} else if *signalOption == "stat" {
+			showStat()
 		}
 		return
 	}
@@ -77,21 +81,25 @@ func bootStrap(force bool) {
 	}
 }
 
-func listenSignal() {
-	c := make(chan os.Signal)
-	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT)
+func reload() {
+	pid, err := getRunningPid()
+	checkErr(err)
 
-	go func() {
-		s := <-c
-		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
-			task.End()
-			logger.Debug(map[string]string{"action": "end", "pid": strconv.Itoa(os.Getpid()), "signal": fmt.Sprintf("%d", s)})
-			os.Exit(0)
-		} else if s == syscall.SIGUSR2 {
-			task.End()
-			bootStrap(true)
-		}
-	}()
+	syscall.Kill(pid, syscall.SIGUSR2)
+}
+
+func end() {
+	pid, err := getRunningPid()
+	checkErr(err)
+
+	syscall.Kill(pid, syscall.SIGTERM)
+}
+
+func showStat() {
+	pid, err := getRunningPid()
+	checkErr(err)
+
+	syscall.Kill(pid, syscall.SIGUSR1)
 }
 
 func savePid() {
@@ -106,34 +114,49 @@ func savePid() {
 	file.Write([]byte(strconv.Itoa(os.Getpid())))
 }
 
-func reload() {
-	pid := getRunningPid()
-	syscall.Kill(pid, syscall.SIGUSR2)
+func listenSignal() {
+	c := make(chan os.Signal)
+	signal.Notify(c)
+
+	go func() {
+		s := <-c
+		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
+			task.End()
+			logger.Debug(map[string]string{"action": "end", "pid": strconv.Itoa(os.Getpid()), "signal": fmt.Sprintf("%d", s)})
+			os.Exit(0)
+		} else if s == syscall.SIGUSR2 {
+			task.End()
+			bootStrap(true)
+		} else if s == syscall.SIGUSR1 {
+			go stat.ShowStat()
+		}
+	}()
 }
 
-func end() {
-	pid := getRunningPid()
-	syscall.Kill(pid, syscall.SIGTERM)
-}
-
-func getRunningPid() int {
+func getRunningPid() (pid int, err error) {
 	pidFile := config.GetConfig("pid_file")
 	if !common.IsFileExist(pidFile) {
-		fmt.Println("no service running!")
+		err = errors.New("no service running")
 		logger.Warning(map[string]string{"warning": "no service running", "pid": strconv.Itoa(os.Getpid())})
-		os.Exit(1)
 	}
 
-	pidStr, _ := ioutil.ReadFile(pidFile)
-	pid, _ := strconv.Atoi(string(pidStr))
+	pidStr, err := ioutil.ReadFile(pidFile)
+	pid, err = strconv.Atoi(string(pidStr))
 
-	return pid
+	return pid, err
 }
 
 func globalRecover() {
 	if p := recover(); p != nil {
 		fmt.Printf("error: %s\n", p)
 		logger.Error("unexpected quit: " + fmt.Sprintf("%s", p))
+		os.Exit(1)
+	}
+}
+
+func checkErr(err error) {
+	if err != nil {
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
