@@ -11,11 +11,16 @@ func ShowStat() {
 		printStat()
 		time.Sleep(1 * time.Second)
 	}
-
 }
 
+/**
+ *清屏
+ */
 func clear() {
-
+	for i := 0; i < 100; i++ {
+		fmt.Printf("\n")
+	}
+	fmt.Printf("\033[0;0H")
 }
 
 func printStat() {
@@ -23,6 +28,7 @@ func printStat() {
 	for _, stat := range stats {
 		fmt.Println(stat)
 	}
+	fmt.Printf("\033[0;0H")
 }
 
 func collectStat() (stats []string) {
