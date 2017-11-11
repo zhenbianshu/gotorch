@@ -26,7 +26,8 @@ func main() {
 
 	var signalOption = flag.String("s", "", `start: 		start the service
 	end: 		stop the running service
-	restart:	restart the running service`)
+	restart:	restart the running service
+	stat:		show task running stat`)
 	var helpFlag = flag.Bool("h", false, "show options")
 	var versionFlag = flag.Bool("v", false, "show service version")
 	flag.Parse()
@@ -116,7 +117,7 @@ func savePid() {
 
 func listenSignal() {
 	c := make(chan os.Signal)
-	signal.Notify(c)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGUSR1, syscall.SIGUSR2)
 
 	go func() {
 		s := <-c
@@ -130,6 +131,8 @@ func listenSignal() {
 		} else if s == syscall.SIGUSR1 {
 			go stat.ShowStat()
 		}
+
+		listenSignal()
 	}()
 }
 

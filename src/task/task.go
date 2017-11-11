@@ -134,6 +134,7 @@ func (t *taskItem) exec(wg *sync.WaitGroup) {
 	t.pids = append(t.pids, cmd.Process.Pid)
 
 	cmd.Wait()
+	WorkingCount--
 	for index, pid := range t.pids {
 		if pid == cmd.Process.Pid {
 			t.pids = append(t.pids[:index], t.pids[:index]...)

@@ -17,9 +17,10 @@ import (
 )
 
 var TaskList map[string]*taskItem
+var CheckInterval time.Duration
+var WorkingCount int
 var configMd5 [16]byte
 var localIp string
-var CheckInterval time.Duration
 
 /**
  * 初始化
@@ -58,6 +59,7 @@ func Run() {
 	for _, taskItem := range TaskList {
 		if taskItem.checkCond() {
 			wg.Add(1)
+			WorkingCount++
 			go taskItem.exec(&wg)
 		}
 	}
