@@ -143,6 +143,10 @@ func load(fileData []byte) {
 			os.Exit(1)
 		}
 
+		if !task.checkIp(){
+			continue
+		}
+
 		TaskList[task.attr.Command] = task
 	}
 }

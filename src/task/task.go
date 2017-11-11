@@ -46,10 +46,6 @@ func (t *taskItem) checkCond() bool {
 		return false
 	}
 
-	if !t.checkIp() {
-		return false
-	}
-
 	if t.isDaemon() {
 		return true
 	}
