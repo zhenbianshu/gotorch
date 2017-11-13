@@ -4,18 +4,18 @@ const LOG_LEVEL_DEBUG = "debug"
 const LOG_LEVEL_WARNING = "warning"
 const LOG_LEVEL_ERROR = "error"
 
-func Debug(info map[string]string) {
+func Debug(pkg string, info ...string) {
 	logger := getLogWriter()
-	logger.write(info, LOG_LEVEL_DEBUG)
+	logger.write(LOG_LEVEL_DEBUG, pkg, info)
 }
 
-func Warning(info map[string]string) {
+func Warning(pkg string, info ...string) {
 	logger := getLogWriter()
-	logger.write(info, LOG_LEVEL_WARNING)
+	logger.write(LOG_LEVEL_WARNING, pkg, info)
 }
 
 func Error(err string) {
-	info := map[string]string{"error": err}
+	info := []string{err}
 	logger := getLogWriter()
-	logger.write(info, LOG_LEVEL_ERROR)
+	logger.write(LOG_LEVEL_ERROR, "error", info)
 }

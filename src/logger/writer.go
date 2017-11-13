@@ -3,10 +3,11 @@ package logger
 import (
 	"common"
 	"config"
-	"encoding/json"
 	"os"
 	"time"
 )
+
+const SEP = " | "
 
 type writer struct {
 	file string
@@ -22,9 +23,9 @@ func getLogWriter() *writer {
 	return logWriter
 }
 
-func (l *writer) setLogFile(level string) {
+func (l *writer) setLogFile(level, pkg string) {
 	logDirConfig := config.GetConfig("log_dir")
-	logDir := logDirConfig + common.GetPkgName() + "/"
+	logDir := logDirConfig + pkg + "/"
 	if !common.IsDirExist(logDir) {
 		os.MkdirAll(logDir, 0777)
 	}
@@ -32,13 +33,15 @@ func (l *writer) setLogFile(level string) {
 	l.file = logDir + fileName
 }
 
-func (l *writer) write(data map[string]string, level string) {
+func (l *writer) write(level, pkg string, data []string) {
 	t := time.Now()
-	data["time"] = t.Format(time.UnixDate)
-	l.setLogFile(level)
-	logContent, _ := json.Marshal(data)
-	logContent = append(logContent, '\n')
+
+	data = append([]string{"time:" + t.Format(time.UnixDate)}, data...)
+	l.setLogFile(level, pkg)
+
+	logContent := common.Join(data, SEP)
+	logContent += "\n"
 
 	file, _ := os.OpenFile(l.file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
-	file.Write(logContent)
+	file.Write([]byte(logContent))
 }
