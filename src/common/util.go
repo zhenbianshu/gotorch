@@ -41,3 +41,19 @@ func IsFileExist(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return err == nil || os.IsExist(err)
 }
+
+func Join(data []string, sep string) string {
+	if len(data) <= 0 {
+		return ""
+	} else if len(data) == 1 {
+		return data[0]
+	}
+
+	str := data[0]
+	data = data[1:]
+	for _, words := range data {
+		str += sep + words
+	}
+
+	return str
+}
