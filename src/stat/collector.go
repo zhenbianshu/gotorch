@@ -5,6 +5,8 @@ import (
 	"task"
 )
 
+// todo 解析linux系统命令结果
+
 func getCpuStat() string {
 	return ""
 }

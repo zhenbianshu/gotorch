@@ -6,6 +6,7 @@ import (
 )
 
 func ShowStat() {
+	// 最好能依附到标准输出
 	for {
 		clear()
 		printStat()

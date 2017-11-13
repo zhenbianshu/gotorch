@@ -70,7 +70,7 @@ func bootStrap(force bool) {
 		cmd.Start()
 		return
 	}
-	logger.Debug(map[string]string{"action": "start", "pid": strconv.Itoa(os.Getpid())})
+	logger.Debug("bootstrap", "action :start", "pid "+strconv.Itoa(os.Getpid()))
 
 	savePid()
 	listenSignal()
@@ -107,7 +107,7 @@ func savePid() {
 	pidFile := config.GetConfig("pid_file")
 	if common.IsFileExist(pidFile) {
 		fmt.Println("pid file already exist!")
-		logger.Warning(map[string]string{"warning": "pid file already exist", "pid": strconv.Itoa(os.Getpid())})
+		logger.Warning("bootstrap", "warning:pid file already exist", "pid"+strconv.Itoa(os.Getpid()))
 		os.Exit(1)
 	}
 
@@ -123,7 +123,7 @@ func listenSignal() {
 		s := <-c
 		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
 			task.End()
-			logger.Debug(map[string]string{"action": "end", "pid": strconv.Itoa(os.Getpid()), "signal": fmt.Sprintf("%d", s)})
+			logger.Debug("bootstrap", "action: end", "pid "+strconv.Itoa(os.Getpid()), "signal "+fmt.Sprintf("%d", s))
 			os.Exit(0)
 		} else if s == syscall.SIGUSR2 {
 			task.End()
@@ -140,7 +140,7 @@ func getRunningPid() (pid int, err error) {
 	pidFile := config.GetConfig("pid_file")
 	if !common.IsFileExist(pidFile) {
 		err = errors.New("no service running")
-		logger.Warning(map[string]string{"warning": "no service running", "pid": strconv.Itoa(os.Getpid())})
+		logger.Warning("bootstrap", "warning :no service running", "pid "+strconv.Itoa(os.Getpid()))
 	}
 
 	pidStr, err := ioutil.ReadFile(pidFile)

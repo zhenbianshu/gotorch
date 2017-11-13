@@ -29,7 +29,7 @@ func Init() {
 	var err error
 	CheckInterval, err = time.ParseDuration(config.GetConfig("interval"))
 	if err != nil {
-		logger.Warning(map[string]string{"warning": "no interval config, use default"})
+		logger.Warning("loader", "warning : no interval config, use default")
 		CheckInterval = 100
 	}
 	
@@ -74,7 +74,7 @@ func End() {
 
 	pidFile := config.GetConfig("pid_file")
 	syscall.Unlink(pidFile)
-	logger.Debug(map[string]string{"bootstrap": "service end, pid" + strconv.Itoa(os.Getpid())})
+	logger.Debug("loader", "service end, pid " + strconv.Itoa(os.Getpid()))
 }
 
 /**
