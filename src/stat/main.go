@@ -1,23 +1,33 @@
 package stat
 
 import (
-	"time"
-	tm "goterm"
+	"fmt"
+	"os/exec"
+	"os"
 )
 
 func ShowStat() {
-	tm.Clear()
-	tm.MoveCursor(1, 1)
-	tm.Println("Current Time:", time.Now().Format(time.RFC1123))
+	clear()
 	printStat()
-	tm.Flush()
+}
+
+/**
+ * 清屏并将光标移到最前
+ */
+func clear() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+	fmt.Printf("\033[0;0H")
+	// todo 将控制权还给终端
 }
 
 func printStat() {
 	stats := collectStat()
 	for _, stat := range stats {
-		tm.Println(stat)
+		fmt.Println(stat)
 	}
+	fmt.Printf("\n")
 }
 
 func collectStat() (stats []string) {
@@ -25,6 +35,6 @@ func collectStat() (stats []string) {
 	cpuStat := getCpuStat()
 	memStat := getMemStat()
 
-	stats = []string{cpuStat, memStat, taskStat}
+	stats = []string{taskStat, cpuStat, memStat}
 	return stats
 }
