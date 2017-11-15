@@ -5,19 +5,44 @@ import (
 	"io"
 	"os"
 	"strings"
+	"logger"
 )
 
 var instance *conf
+
+const confFile = "/etc/gotorch.conf"
+const confDefault = `# 配置文件
+tasks = /tmp/gotorch/task.json
+
+# 日志目录
+log_dir = /tmp/gotorch/
+
+# 使用的shell环境
+bash = /bin/bash
+
+# 出问题时的邮件通知人
+mail_to = zhenbianshu@foxmail.com
+
+# 进程PID文件
+pid_file = /tmp/gotorch.pid
+
+# 每轮任务的间隔时间 (ms)
+interval = 100`
 
 type conf struct {
 	data map[string]string
 }
 
 func newConf() *conf {
-	rootPath, _ := os.Getwd()
-	file, err := os.Open(rootPath + "/src/config/gotask.ini")
+	file, err := os.Open(confFile)
 	if err != nil {
-		os.Exit(222)
+		// 如果没有此文件，则将默认配置写入其中
+		logger.Warning("bootstrap", "open conf file error:"+err.Error())
+		defaultFile, _ := os.OpenFile(confFile, os.O_WRONLY|os.O_CREATE, 0644)
+		defer defaultFile.Close()
+		defaultFile.Write([]byte(confDefault))
+
+		file, _ = os.Open(confFile)
 	}
 	defer file.Close()
 

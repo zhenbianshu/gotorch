@@ -82,6 +82,7 @@ func End() {
  */
 func readFile(fileName string) []byte {
 	fileHandler, err := os.Open(fileName)
+	defer fileHandler.Close()
 
 	if err != nil {
 		fmt.Println("can't find the tasks file!")
