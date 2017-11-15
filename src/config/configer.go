@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"logger"
 )
 
 var instance *conf
@@ -37,7 +36,6 @@ func newConf() *conf {
 	file, err := os.Open(confFile)
 	if err != nil {
 		// 如果没有此文件，则将默认配置写入其中
-		logger.Warning("bootstrap", "open conf file error:"+err.Error())
 		defaultFile, _ := os.OpenFile(confFile, os.O_WRONLY|os.O_CREATE, 0644)
 		defer defaultFile.Close()
 		defaultFile.Write([]byte(confDefault))
