@@ -151,9 +151,13 @@ func getRunningPid() (pid int, err error) {
 
 func globalRecover() {
 	if p := recover(); p != nil {
-		fmt.Printf("error: %s\n", p)
+		pidFile := config.GetConfig("pid_file")
+		if common.IsFileExist(pidFile) {
+			syscall.Unlink(pidFile)
+		}
 		logger.Error("unexpected quit: " + fmt.Sprintf("%s", p))
-		os.Exit(1)
+		fmt.Println("unexpected quit: " + fmt.Sprintf("%s", p))
+		os.Exit(222)
 	}
 }
 

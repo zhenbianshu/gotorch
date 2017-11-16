@@ -32,7 +32,7 @@ func Init() {
 		logger.Warning("loader", "warning : no interval config, use default")
 		CheckInterval = 100
 	}
-	
+
 	TaskList = make(map[string]*taskItem)
 
 	addrs, _ := net.InterfaceAddrs()
@@ -74,7 +74,7 @@ func End() {
 
 	pidFile := config.GetConfig("pid_file")
 	syscall.Unlink(pidFile)
-	logger.Debug("loader", "service end, pid " + strconv.Itoa(os.Getpid()))
+	logger.Debug("loader", "service end, pid "+strconv.Itoa(os.Getpid()))
 }
 
 /**
@@ -85,9 +85,7 @@ func readFile(fileName string) []byte {
 	defer fileHandler.Close()
 
 	if err != nil {
-		fmt.Println("can't find the tasks file!")
-		logger.Error("can't find the tasks file" + err.Error())
-		os.Exit(1)
+		panic(err.Error())
 	}
 	fileData, _ := ioutil.ReadAll(fileHandler)
 
@@ -113,9 +111,7 @@ func load(fileData []byte) {
 	taskConfigs := make([]attr, 0)
 	err := json.Unmarshal(fileData, &taskConfigs)
 	if err != nil {
-		fmt.Println("task config parse error: " + err.Error())
-		logger.Error("task config parse error: " + err.Error())
-		os.Exit(1)
+		panic("task config parse error: " + err.Error())
 	}
 
 	for _, oldTask := range TaskList {
@@ -146,7 +142,7 @@ func load(fileData []byte) {
 			os.Exit(1)
 		}
 
-		if !task.checkIp(){
+		if !task.checkIp() {
 			continue
 		}
 
