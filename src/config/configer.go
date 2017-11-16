@@ -5,11 +5,14 @@ import (
 	"io"
 	"os"
 	"strings"
+	"fmt"
+	"runtime"
 )
 
 var instance *conf
 
-const confFile = "/etc/gotorch.conf"
+const confFileMac = "/tmp/gotorch.conf"
+const confFileLinux = "/etc/gotorch.conf"
 const confDefault = `# 配置文件
 tasks = /tmp/gotorch/task.json
 
@@ -33,12 +36,23 @@ type conf struct {
 }
 
 func newConf() *conf {
+	var confFile string
+	if runtime.GOOS == "darwin" {
+		confFile = confFileMac
+	} else {
+		confFile = confFileLinux
+	}
 	file, err := os.Open(confFile)
 	if err != nil {
+		file.Close()
 		// 如果没有此文件，则将默认配置写入其中
-		defaultFile, _ := os.OpenFile(confFile, os.O_WRONLY|os.O_CREATE, 0644)
-		defer defaultFile.Close()
+		defaultFile, err := os.OpenFile(confFile, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(222)
+		}
 		defaultFile.Write([]byte(confDefault))
+		fmt.Println(confDefault)
 
 		file, _ = os.Open(confFile)
 	}
