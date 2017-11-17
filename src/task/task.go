@@ -129,6 +129,7 @@ func (t *taskItem) exec(wg *sync.WaitGroup) {
 	wg.Done()
 	if err != nil {
 		logger.Error(t.attr.Command + " : " + err.Error())
+		t.drop()
 		return
 	}
 	t.pids = append(t.pids, cmd.Process.Pid)

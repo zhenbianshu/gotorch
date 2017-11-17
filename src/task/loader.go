@@ -149,3 +149,11 @@ func load(fileData []byte) {
 		TaskList[task.attr.Command] = task
 	}
 }
+
+func (t *taskItem) drop() {
+	for index, item := range TaskList {
+		if item.attr.Command == t.attr.Command {
+			delete(TaskList, index)
+		}
+	}
+}
