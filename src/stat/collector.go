@@ -3,16 +3,28 @@ package stat
 import (
 	"strconv"
 	"task"
+	"os/exec"
+	"strings"
+	"runtime"
 )
 
-// todo 解析linux系统命令结果
-
 func getCpuStat() string {
-	return ""
+	cmd := exec.Command("/usr/bin/uptime")
+	res, _ := cmd.Output()
+	segments := strings.Split(string(res), " ")
+	return "system cpu load: " + segments[11]
 }
 
 func getMemStat() string {
-	return ""
+	var memStat string
+	if runtime.GOOS == "darwin" {
+		memStat = "memory:execute 'free' yourself!"
+	} else {
+		cmd := exec.Command("/usr/bin/free -m")
+		res, _ := cmd.Output()
+		memStat = string(res)
+	}
+	return memStat
 }
 
 func getTaskStat() string {
