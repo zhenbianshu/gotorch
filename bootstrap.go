@@ -59,8 +59,8 @@ func main() {
 
 }
 
+// bootstrap a daemon process.
 func bootStrap(force bool) {
-	// 启动后台进程
 	if os.Getppid() != 1 || force {
 		filePath, _ := filepath.Abs(os.Args[0])
 		cmd := exec.Command(filePath, os.Args[1:]...)
@@ -82,6 +82,7 @@ func bootStrap(force bool) {
 	}
 }
 
+// reload process with a customize signal.
 func reload() {
 	pid, err := getRunningPid()
 	checkErr(err)
@@ -89,6 +90,7 @@ func reload() {
 	syscall.Kill(pid, syscall.SIGUSR2)
 }
 
+// end the process with SIGTERM signal.
 func end() {
 	pid, err := getRunningPid()
 	checkErr(err)
@@ -96,6 +98,7 @@ func end() {
 	syscall.Kill(pid, syscall.SIGTERM)
 }
 
+// showStat by sending a customize signal.
 func showStat() {
 	pid, err := getRunningPid()
 	checkErr(err)
@@ -103,6 +106,7 @@ func showStat() {
 	syscall.Kill(pid, syscall.SIGUSR1)
 }
 
+// save the process pid in file
 func savePid() {
 	pidFile := config.GetConfig("pid_file")
 	if common.IsFileExist(pidFile) {
@@ -115,6 +119,7 @@ func savePid() {
 	file.Write([]byte(strconv.Itoa(os.Getpid())))
 }
 
+// start a goroutine to listen the signal.
 func listenSignal() {
 	c := make(chan os.Signal)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGUSR1, syscall.SIGUSR2)
@@ -136,6 +141,7 @@ func listenSignal() {
 	}()
 }
 
+// get the running process's pid from file
 func getRunningPid() (pid int, err error) {
 	pidFile := config.GetConfig("pid_file")
 	if !common.IsFileExist(pidFile) {
