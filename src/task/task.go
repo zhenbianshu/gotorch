@@ -9,7 +9,7 @@ import (
 )
 
 type taskItem struct {
-	times map[int][]int
+	times map[int][]bool
 	attr  attr
 	last  int64
 	cmd   string
@@ -30,12 +30,7 @@ const (
  * 判断某个时间单位是否符合
  */
 func (t *taskItem) isOn(order int, timePoint int) bool {
-	for _, num := range t.times[order] {
-		if num == timePoint {
-			return true
-		}
-	}
-	return false
+	return t.times[order][timePoint]
 }
 
 /**

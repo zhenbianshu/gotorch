@@ -18,6 +18,7 @@ type attr struct {
 const TypeDaemon = "daemon"
 const TypeCommon = "common"
 
+// check if time config is valid
 func (a attr) timeValid() (isValid bool, err error) {
 	times := strings.Split(a.Times, " ")
 	if len(times) != 6 {
@@ -47,12 +48,13 @@ func (a attr) timeValid() (isValid bool, err error) {
 	return true, nil
 }
 
+// build a task item with a attr config
 func (a attr) buildTask() (task *taskItem, err error) {
 	if isValid, err := a.timeValid(); !isValid {
 		return nil, err
 	}
 
-	times := make(map[int][]int)
+	times := make(map[int][]bool)
 	timeConf := strings.Split(a.Times, " ")
 	for index, argStr := range timeConf {
 		limitList, err := parseTimeRange(argStr, index)
@@ -81,15 +83,15 @@ func inRange(num int, index int) bool {
 	return valid
 }
 
-func parseTimeRange(argStr string, index int) ([]int, error) {
+func parseTimeRange(argStr string, index int) ([]bool, error) {
 	parseErr := errors.New("time range parse error")
 
-	points := []int{}
+	points := []bool{}
 	argParts := strings.Split(argStr, ",")
 	for _, argPart := range argParts {
 		eachArg := strings.Split(argPart, "/")
 		if len(eachArg) > 2 {
-			return []int{}, parseErr
+			return []bool{}, parseErr
 		}
 
 		var every int
@@ -103,7 +105,7 @@ func parseTimeRange(argStr string, index int) ([]int, error) {
 		if strings.IndexAny(eachArg[0], "-") >= 0 {
 			numRange := strings.Split(argStr, "-")
 			if len(numRange) != 2 {
-				return []int{}, parseErr
+				return []bool{}, parseErr
 			}
 
 			start, _ = strconv.Atoi(numRange[0])
@@ -117,7 +119,7 @@ func parseTimeRange(argStr string, index int) ([]int, error) {
 		}
 
 		for ; start < end; start += every {
-			points = append(points, start)
+			points[start] = true
 		}
 	}
 
