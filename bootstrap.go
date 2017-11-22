@@ -54,9 +54,8 @@ func main() {
 		return
 	}
 
-	fmt.Println("unknown option, use -h option to get help!")
-	os.Exit(0)
-
+	// 无选项时默认启动服务
+	bootStrap(false)
 }
 
 // bootstrap a daemon process.
