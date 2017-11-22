@@ -52,7 +52,6 @@ func newConf() *conf {
 			os.Exit(222)
 		}
 		defaultFile.Write([]byte(confDefault))
-		fmt.Println(confDefault)
 
 		file, _ = os.Open(confFile)
 	}

@@ -86,7 +86,8 @@ func inRange(num int, index int) bool {
 func parseTimeRange(argStr string, index int) ([]bool, error) {
 	parseErr := errors.New("time range parse error")
 
-	points := []bool{}
+	_, max := getRange(index)
+	points := make([]bool, max+1)
 	argParts := strings.Split(argStr, ",")
 	for _, argPart := range argParts {
 		eachArg := strings.Split(argPart, "/")
