@@ -27,13 +27,6 @@ const (
 )
 
 /**
- * 判断某个时间单位是否符合
- */
-func (t *taskItem) isOn(order int, timePoint int) bool {
-	return t.times[order][timePoint]
-}
-
-/**
  * 检查执行条件
  */
 func (t *taskItem) checkCond() bool {
@@ -82,21 +75,18 @@ func (t *taskItem) checkTime() bool {
 		return false
 	}
 
-	curTime := make(map[int]int)
-	curTime[second] = current.Second()
-	curTime[minute] = current.Minute()
-	curTime[hour] = current.Hour()
-	curTime[day] = current.Day()
-	curTime[week] = int(current.Weekday())
-	curTime[month] = int(current.Month())
+	curSec := current.Second()
+	curMin := current.Minute()
+	curHour := current.Hour()
+	curDay := current.Day()
+	curWeek := int(current.Weekday())
+	curMonth := int(current.Month())
 
-	for i := second; i <= month; i++ {
-		if !t.isOn(i, curTime[i]) {
-			return false
-		}
+	if t.times[second][curSec] && t.times[minute][curMin]&&t.times[hour][curHour]&&t.times[day][curDay]&&t.times[week][curWeek]&&t.times[month][curMonth]{
+		return true
 	}
 
-	return true
+	return false
 }
 
 func (t *taskItem) checkIp() bool {
