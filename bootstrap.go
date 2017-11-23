@@ -69,6 +69,7 @@ func bootStrap(force bool) {
 
 	savePid()
 	listenSignal()
+	// monitor() todo add
 
 	task.Init()
 	for {
@@ -109,11 +110,11 @@ func savePid() {
 // start a goroutine to listen the signal.
 func listenSignal() {
 	c := make(chan os.Signal)
-	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGUSR2)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGUSR2)
 
 	go func() {
 		s := <-c
-		if s == syscall.SIGTERM || s == syscall.SIGTSTP || s == syscall.SIGINT {
+		if s == syscall.SIGTERM {
 			task.End()
 			logger.Debug("bootstrap", "action: end", "pid "+strconv.Itoa(os.Getpid()), "signal "+fmt.Sprintf("%d", s))
 			os.Exit(0)
@@ -121,8 +122,6 @@ func listenSignal() {
 			task.End()
 			bootStrap(true)
 		}
-
-		listenSignal()
 	}()
 }
 
