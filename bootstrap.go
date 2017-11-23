@@ -16,7 +16,6 @@ import (
 	"logger"
 	"flag"
 	"errors"
-	"stat"
 )
 
 const Version = "0.9"
@@ -26,8 +25,7 @@ func main() {
 
 	var signalOption = flag.String("s", "", `start: 		start the service
 	end: 		stop the running service
-	restart:	restart the running service
-	stat:		show task running stat`)
+	restart:	restart the running service`)
 	var helpFlag = flag.Bool("h", false, "show options")
 	var versionFlag = flag.Bool("v", false, "show service version")
 	flag.Parse()
@@ -48,8 +46,6 @@ func main() {
 			end()
 		} else if *signalOption == "restart" {
 			reload()
-		} else if *signalOption == "stat" {
-			showStat()
 		}
 		return
 	}
@@ -97,14 +93,6 @@ func end() {
 	syscall.Kill(pid, syscall.SIGTERM)
 }
 
-// showStat by sending a customize signal.
-func showStat() {
-	pid, err := getRunningPid()
-	checkErr(err)
-
-	syscall.Kill(pid, syscall.SIGUSR1)
-}
-
 // save the process pid in file
 func savePid() {
 	pidFile := config.GetConfig("pid_file")
@@ -121,7 +109,7 @@ func savePid() {
 // start a goroutine to listen the signal.
 func listenSignal() {
 	c := make(chan os.Signal)
-	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGUSR1, syscall.SIGUSR2)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGTSTP, syscall.SIGINT, syscall.SIGUSR2)
 
 	go func() {
 		s := <-c
@@ -132,8 +120,6 @@ func listenSignal() {
 		} else if s == syscall.SIGUSR2 {
 			task.End()
 			bootStrap(true)
-		} else if s == syscall.SIGUSR1 {
-			go stat.ShowStat()
 		}
 
 		listenSignal()
