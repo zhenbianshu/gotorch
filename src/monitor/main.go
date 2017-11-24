@@ -1,14 +1,17 @@
-package stat
+package monitor
 
 import (
 	"fmt"
 	"os/exec"
 	"os"
+	"logger"
 )
 
-func ShowStat() {
-	clear()
-	printStat()
+func CheckStat() {
+	stats := collectStat()
+	for item, stat := range stats {
+		logger.Debug("monitor", item+":"+stat)
+	}
 }
 
 /**
@@ -30,11 +33,11 @@ func printStat() {
 	fmt.Printf("\n")
 }
 
-func collectStat() (stats []string) {
+func collectStat() (stats map[string]string) {
 	taskStat := getTaskStat()
 	cpuStat := getCpuStat()
 	memStat := getMemStat()
 
-	stats = []string{taskStat, cpuStat, memStat}
+	stats = map[string]string{"task": taskStat, "cpu": cpuStat, "memory": memStat}
 	return stats
 }

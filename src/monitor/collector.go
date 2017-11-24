@@ -1,4 +1,4 @@
-package stat
+package monitor
 
 import (
 	"strconv"

@@ -69,7 +69,7 @@ func bootStrap(force bool) {
 
 	savePid()
 	listenSignal()
-	// monitor() todo add
+	go monitor()
 
 	task.Init()
 	for {
@@ -94,6 +94,12 @@ func end() {
 	syscall.Kill(pid, syscall.SIGTERM)
 }
 
+func monitor()  {
+	for  {
+		time.Sleep(60*time.Second)
+		monitor.CheckStat()
+	}
+}
 // save the process pid in file
 func savePid() {
 	pidFile := config.GetConfig("pid_file")
