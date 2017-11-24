@@ -19,7 +19,7 @@ import (
 	"monitor"
 )
 
-const Version = "0.9"
+const Version = "1.0"
 
 func main() {
 	defer globalRecover()
