@@ -51,7 +51,7 @@ func main() {
 		return
 	}
 
-	// 无选项时默认启动服务
+	// start service default
 	bootStrap(false)
 }
 
@@ -95,6 +95,7 @@ func end() {
 	syscall.Kill(pid, syscall.SIGTERM)
 }
 
+// start the monitor goroutine
 func startMonitor() {
 	for {
 		time.Sleep(60 * time.Second)
@@ -147,6 +148,7 @@ func getRunningPid() (pid int, err error) {
 	return pid, err
 }
 
+// set a function to catch a panic
 func globalRecover() {
 	if p := recover(); p != nil {
 		pidFile := config.GetConfig("pid_file")
@@ -159,6 +161,7 @@ func globalRecover() {
 	}
 }
 
+// check error and exit
 func checkErr(err error) {
 	if err != nil {
 		fmt.Println(err.Error())

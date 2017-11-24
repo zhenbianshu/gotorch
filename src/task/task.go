@@ -26,9 +26,7 @@ const (
 	month
 )
 
-/**
- * 检查执行条件
- */
+// check exec cond
 func (t *taskItem) checkCond() bool {
 	if !t.checkMax() {
 		return false
@@ -45,6 +43,7 @@ func (t *taskItem) checkCond() bool {
 	return true
 }
 
+// check if task is a daemon type
 func (t *taskItem) isDaemon() bool {
 	if t.attr.TaskType == TypeDaemon {
 		return true
@@ -53,9 +52,7 @@ func (t *taskItem) isDaemon() bool {
 	return false
 }
 
-/**
- * 检查当前执行最大进程数
- */
+// check running task count
 func (t *taskItem) checkMax() bool {
 	if t.attr.Max > 0 && len(t.pids) >= t.attr.Max {
 		return false
@@ -64,9 +61,7 @@ func (t *taskItem) checkMax() bool {
 
 }
 
-/**
- * 检查执行时间
- */
+// check if task can exec this second
 func (t *taskItem) checkTime() bool {
 	current := time.Now()
 	curTimestamp := current.Unix()
@@ -89,6 +84,7 @@ func (t *taskItem) checkTime() bool {
 	return false
 }
 
+// check ip limit
 func (t *taskItem) checkIp() bool {
 	if len(t.attr.Ips) < 1 {
 		return true
@@ -103,9 +99,7 @@ func (t *taskItem) checkIp() bool {
 	return false
 }
 
-/**
- * 执行命令
- */
+// run the task, save pid and wait it ends
 func (t *taskItem) exec(wg *sync.WaitGroup) {
 	t.last = time.Now().Unix()
 
@@ -128,9 +122,7 @@ func (t *taskItem) exec(wg *sync.WaitGroup) {
 	}
 }
 
-/**
- * 清理进程
- */
+// kill a process by sending a SIGKILL signal
 func (t *taskItem) clearTask() {
 	for _, pid := range t.pids {
 		syscall.Kill(pid, syscall.SIGKILL)

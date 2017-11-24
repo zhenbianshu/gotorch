@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// get current file name
 func GetFileName() string {
 	_, sourcePath, _, _ := runtime.Caller(4)
 	rootDir, _ := os.Getwd()
@@ -17,6 +18,7 @@ func GetFileName() string {
 	return filename
 }
 
+// get a package name
 func GetPkgName() string {
 	_, filePath, _, _ := runtime.Caller(0)
 	file, _ := os.Open(filePath)
@@ -27,6 +29,7 @@ func GetPkgName() string {
 	return string(pkgName)
 }
 
+// check directory exist
 func IsDirExist(path string) bool {
 	file, err := os.Stat(path)
 
@@ -37,11 +40,13 @@ func IsDirExist(path string) bool {
 	}
 }
 
+// check file exist
 func IsFileExist(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return err == nil || os.IsExist(err)
 }
 
+// implode the strings
 func Join(data []string, sep string) string {
 	if len(data) <= 0 {
 		return ""

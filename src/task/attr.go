@@ -83,6 +83,7 @@ func inRange(num int, index int) bool {
 	return valid
 }
 
+// parse time config and get time point
 func parseTimeRange(argStr string, index int) ([]bool, error) {
 	parseErr := errors.New("time range parse error")
 
@@ -127,6 +128,7 @@ func parseTimeRange(argStr string, index int) ([]bool, error) {
 	return points, nil
 }
 
+// get time range by type
 func getRange(index int) (start, end int) {
 	switch index {
 	case second, minute:

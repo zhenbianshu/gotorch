@@ -13,22 +13,22 @@ var instance *conf
 
 const confFileMac = "/tmp/gotorch.conf"
 const confFileLinux = "/etc/gotorch.conf"
-const confDefault = `# 配置文件
+const confDefault = `# task list file
 tasks = /tmp/gotorch/task.json
 
-# 日志目录
+# log directory
 log_dir = /tmp/gotorch/
 
-# 使用的shell环境
+# shell evn
 bash = /bin/bash
 
-# 出问题时的邮件通知人
+# mail receiver when problem
 mail_to = zhenbianshu@foxmail.com
 
-# 进程PID文件
+# running service pid file
 pid_file = /tmp/gotorch.pid
 
-# 每轮任务的间隔时间 (ms)
+# interval time check if there is task can be exec (ms)
 interval = 100`
 
 type conf struct {
@@ -45,7 +45,7 @@ func newConf() *conf {
 	file, err := os.Open(confFile)
 	if err != nil {
 		file.Close()
-		// 如果没有此文件，则将默认配置写入其中
+		// if config file not exists, then add one
 		defaultFile, err := os.OpenFile(confFile, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -72,6 +72,7 @@ func newConf() *conf {
 	return conf
 }
 
+// parse config line and save configs
 func parseLine(line []byte, configData map[string]string) {
 	if len(line) <= 0 {
 		return

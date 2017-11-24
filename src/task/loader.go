@@ -22,9 +22,7 @@ var WorkingCount int
 var configMd5 [16]byte
 var localIp string
 
-/**
- * 初始化
- */
+// package init
 func Init() {
 	var err error
 	CheckInterval, err = time.ParseDuration(config.GetConfig("interval"))
@@ -45,9 +43,7 @@ func Init() {
 	}
 }
 
-/**
- * 运行
- */
+// run : check and exec tasks
 func Run() {
 	tasksFile := config.GetConfig("tasks")
 	fileData := readFile(tasksFile)
@@ -67,6 +63,7 @@ func Run() {
 	wg.Wait()
 }
 
+// end and clear tasks
 func End() {
 	for _, taskItem := range TaskList {
 		taskItem.clearTask()
@@ -77,9 +74,7 @@ func End() {
 	logger.Debug("loader", "service end, pid "+strconv.Itoa(os.Getpid()))
 }
 
-/**
- * 读取配置文件
- */
+// read the task file
 func readFile(fileName string) []byte {
 	fileHandler, err := os.Open(fileName)
 	defer fileHandler.Close()
@@ -92,9 +87,7 @@ func readFile(fileName string) []byte {
 	return fileData
 }
 
-/**
- * 校验配置文件MD5
- */
+// check task file md5, if changed then reload
 func checkMd5(fileData []byte) bool {
 	sum := md5.Sum(fileData)
 	if sum != configMd5 {
@@ -104,9 +97,7 @@ func checkMd5(fileData []byte) bool {
 	return true
 }
 
-/**
- * 加载配置
- */
+// load the config
 func load(fileData []byte) {
 	taskConfigs := make([]attr, 0)
 	err := json.Unmarshal(fileData, &taskConfigs)
@@ -150,6 +141,7 @@ func load(fileData []byte) {
 	}
 }
 
+// delete a task item
 func (t *taskItem) drop() {
 	for index, item := range TaskList {
 		if item.attr.Command == t.attr.Command {
