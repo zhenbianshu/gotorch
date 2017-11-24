@@ -16,6 +16,7 @@ import (
 	"logger"
 	"flag"
 	"errors"
+	"monitor"
 )
 
 const Version = "0.9"
@@ -69,7 +70,7 @@ func bootStrap(force bool) {
 
 	savePid()
 	listenSignal()
-	go monitor()
+	go startMonitor()
 
 	task.Init()
 	for {
@@ -94,12 +95,13 @@ func end() {
 	syscall.Kill(pid, syscall.SIGTERM)
 }
 
-func monitor()  {
-	for  {
-		time.Sleep(60*time.Second)
+func startMonitor() {
+	for {
+		time.Sleep(60 * time.Second)
 		monitor.CheckStat()
 	}
 }
+
 // save the process pid in file
 func savePid() {
 	pidFile := config.GetConfig("pid_file")
