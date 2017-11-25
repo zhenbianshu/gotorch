@@ -10,7 +10,7 @@ import (
 
 func getCpuStat() string {
 	cmd := exec.Command("/usr/bin/uptime")
-	res,_ :=cmd.Output()
+	res, _ := cmd.Output()
 	segments := strings.Split(string(res), " ")
 	return "system cpu load: " + segments[10]
 }
