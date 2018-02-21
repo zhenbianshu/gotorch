@@ -16,7 +16,7 @@ a multi-server task management system written in go.
 #licence
 MIT
 
-#run example 
+#run example  
 go run bootstrap.go -s start
 
 #design
