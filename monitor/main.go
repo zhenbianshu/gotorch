@@ -1,7 +1,7 @@
 package monitor
 
 import (
-	"logger"
+	"gotorch/logger"
 )
 
 func CheckStat() {

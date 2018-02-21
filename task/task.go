@@ -1,11 +1,12 @@
 package task
 
 import (
-	"logger"
 	"os/exec"
 	"sync"
 	"syscall"
 	"time"
+
+	"gotorch/logger"
 )
 
 type taskItem struct {
@@ -77,7 +78,7 @@ func (t *taskItem) checkTime() bool {
 	curWeek := int(current.Weekday())
 	curMonth := int(current.Month())
 
-	if t.times[second][curSec] && t.times[minute][curMin]&&t.times[hour][curHour]&&t.times[day][curDay]&&t.times[week][curWeek]&&t.times[month][curMonth]{
+	if t.times[second][curSec] && t.times[minute][curMin] && t.times[hour][curHour] && t.times[day][curDay] && t.times[week][curWeek] && t.times[month][curMonth] {
 		return true
 	}
 

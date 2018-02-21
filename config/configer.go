@@ -2,11 +2,11 @@ package config
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
-	"strings"
-	"fmt"
 	"runtime"
+	"strings"
 )
 
 var instance *conf

@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"common"
-	"config"
+	"gotorch/common"
+	"gotorch/config"
 	"os"
 	"time"
 )

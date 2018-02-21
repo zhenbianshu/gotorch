@@ -16,5 +16,8 @@ a multi-server task management system written in go.
 #licence
 MIT
 
+#run example 
+go run bootstrap.go -s start
+
 #design
 [Gotorch - 多机定时任务管理系统](http://www.cnblogs.com/zhenbianshu/p/7905678.html)
