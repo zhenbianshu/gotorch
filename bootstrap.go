@@ -1,9 +1,14 @@
 package main
 
 import (
-	"common"
-	"config"
+	"errors"
+	"flag"
 	"fmt"
+	"gotorch/common"
+	"gotorch/config"
+	"gotorch/logger"
+	"gotorch/monitor"
+	"gotorch/task"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -11,12 +16,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"syscall"
-	"task"
 	"time"
-	"logger"
-	"flag"
-	"errors"
-	"monitor"
 )
 
 const Version = "1.0"
@@ -40,6 +40,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	println(*signalOption)
 	if *signalOption != "" {
 		if *signalOption == "start" {
 			bootStrap(false)

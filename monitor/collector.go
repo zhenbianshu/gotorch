@@ -1,11 +1,12 @@
 package monitor
 
 import (
-	"strconv"
-	"task"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
+
+	"gotorch/task"
 )
 
 func getCpuStat() string {
